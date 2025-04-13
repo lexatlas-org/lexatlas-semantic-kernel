@@ -4,32 +4,39 @@
 # Azure Static Web App Script
 # ===========================
 
+# Load environment
+if [[ -f .env ]]; then
+  source .env
+else
+  echo " Error: .env file not found in the current directory."
+  echo " Please create a .env file with your configuration values."
+  exit 1
+fi
+
 # Supported regions for Microsoft.Web/staticSites
 VALID_REGIONS=("westus2" "centralus" "eastus2" "westeurope" "eastasia")
 
-# Prompt for inputs or use default values
-read -p "Static Web App name [default: lexatlas-frontend]: " SWA_NAME
-SWA_NAME=${SWA_NAME:-lexatlas-frontend}
+read -p "Static Web App name [default: $SWA_NAME]: " SWA_NAME_INPUT
+SWA_NAME=${SWA_NAME_INPUT:-$SWA_NAME}
 
-read -p "Resource group name [default: lexatlas-rg]: " RG_NAME
-RG_NAME=${RG_NAME:-lexatlas-rg}
+read -p "Resource group name [default: $RG_NAME]: " RG_NAME_INPUT
+RG_NAME=${RG_NAME_INPUT:-$RG_NAME}
 
-read -p "Azure region [default: eastus2]: " LOCATION
-LOCATION=${LOCATION:-eastus2}
+read -p "Azure region [default: $LOCATION]: " LOCATION_INPUT
+LOCATION=${LOCATION_INPUT:-$LOCATION}
 LOCATION_LOWER=$(echo "$LOCATION" | tr '[:upper:]' '[:lower:]')
 
-# Validate location
 if [[ ! " ${VALID_REGIONS[*]} " =~ " ${LOCATION_LOWER} " ]]; then
   echo " Error: '$LOCATION' is not a valid region for Azure Static Web Apps."
   echo " Valid regions are: ${VALID_REGIONS[*]}"
   exit 1
 fi
 
-read -p "GitHub repo URL [default: https://github.com/lexatlas-org/lexatlas-frontend]: " GITHUB_REPO
-GITHUB_REPO=${GITHUB_REPO:-https://github.com/lexatlas-org/lexatlas-frontend}
+read -p "GitHub repo URL [default: $GITHUB_REPO]: " GITHUB_REPO_INPUT
+GITHUB_REPO=${GITHUB_REPO_INPUT:-$GITHUB_REPO}
 
-read -p "Branch name to deploy [default: main]: " BRANCH
-BRANCH=${BRANCH:-main}
+read -p "Branch name to deploy [default: $BRANCH]: " BRANCH_INPUT
+BRANCH=${BRANCH_INPUT:-$BRANCH}
 
 read -p "GitHub token (leave empty to use browser login): " GITHUB_TOKEN
 

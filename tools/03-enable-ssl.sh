@@ -4,23 +4,30 @@
 # Azure Static Web App - Enable SSL
 # ====================================
 
-# Prompt for inputs with default values
-read -p "Static Web App name [default: lexatlas-frontend]: " SWA_NAME
-SWA_NAME=${SWA_NAME:-lexatlas-frontend}
-
-read -p "Resource group name [default: lexatlas-rg]: " RG_NAME
-RG_NAME=${RG_NAME:-lexatlas-rg}
-
-read -p "Custom domain to enable SSL [default: www.lexatlas.cloud]: " CUSTOM_DOMAIN
-CUSTOM_DOMAIN=${CUSTOM_DOMAIN:-www.lexatlas.cloud}
-
-# Validate domain format
-if [[ ! "$CUSTOM_DOMAIN" =~ ^[a-zA-Z0-9.-]+$ ]]; then
-  echo " Error: Invalid domain format: $CUSTOM_DOMAIN"
+# Load environment
+if [[ -f .env ]]; then
+  source .env
+else
+  echo " Error: .env file not found in the current directory."
+  echo " Please create a .env file with your configuration values."
   exit 1
 fi
 
-echo "🔐 Enabling HTTPS for '$CUSTOM_DOMAIN' on Static Web App '$SWA_NAME'..."
+read -p "Static Web App name [default: $SWA_NAME]: " SWA_NAME_INPUT
+SWA_NAME=${SWA_NAME_INPUT:-$SWA_NAME}
+
+read -p "Resource group name [default: $RG_NAME]: " RG_NAME_INPUT
+RG_NAME=${RG_NAME_INPUT:-$RG_NAME}
+
+read -p "Custom domain to enable SSL [default: $CUSTOM_DOMAIN]: " CUSTOM_DOMAIN_INPUT
+CUSTOM_DOMAIN=${CUSTOM_DOMAIN_INPUT:-$CUSTOM_DOMAIN}
+
+if [[ ! "$CUSTOM_DOMAIN" =~ ^[a-zA-Z0-9.-]+$ ]]; then
+  echo " Invalid domain format: $CUSTOM_DOMAIN"
+  exit 1
+fi
+
+echo " Enabling HTTPS for '$CUSTOM_DOMAIN'..."
 
 # Enable SSL
 az staticwebapp hostname enable-ssl \
