@@ -16,8 +16,8 @@ fi
 read -p "Static Web App name [default: $SWA_NAME]: " SWA_NAME_INPUT
 SWA_NAME=${SWA_NAME_INPUT:-$SWA_NAME}
 
-read -p "Resource group name [default: $RG_NAME]: " RG_NAME_INPUT
-RG_NAME=${RG_NAME_INPUT:-$RG_NAME}
+read -p "Resource group name [default: $AZURE_RESOURCE_GROUP]: " AZURE_RESOURCE_GROUP_INPUT
+AZURE_RESOURCE_GROUP=${AZURE_RESOURCE_GROUP_INPUT:-$AZURE_RESOURCE_GROUP}
 
 read -p "Custom domain to enable SSL [default: $CUSTOM_DOMAIN]: " CUSTOM_DOMAIN_INPUT
 CUSTOM_DOMAIN=${CUSTOM_DOMAIN_INPUT:-$CUSTOM_DOMAIN}
@@ -32,7 +32,7 @@ echo " Enabling HTTPS for '$CUSTOM_DOMAIN'..."
 # Enable SSL
 az staticwebapp hostname enable-ssl \
   --name "$SWA_NAME" \
-  --resource-group "$RG_NAME" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
   --hostname "$CUSTOM_DOMAIN"
 
 echo ""

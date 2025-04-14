@@ -17,8 +17,8 @@ fi
 read -p "Static Web App name [default: $SWA_NAME]: " SWA_NAME_INPUT
 SWA_NAME=${SWA_NAME_INPUT:-$SWA_NAME}
 
-read -p "Resource group name [default: $RG_NAME]: " RG_NAME_INPUT
-RG_NAME=${RG_NAME_INPUT:-$RG_NAME}
+read -p "Resource group name [default: $AZURE_RESOURCE_GROUP]: " AZURE_RESOURCE_GROUP_INPUT
+AZURE_RESOURCE_GROUP=${AZURE_RESOURCE_GROUP_INPUT:-$AZURE_RESOURCE_GROUP}
 
 read -p "Custom domain to assign [default: $CUSTOM_DOMAIN]: " CUSTOM_DOMAIN_INPUT
 CUSTOM_DOMAIN=${CUSTOM_DOMAIN_INPUT:-$CUSTOM_DOMAIN}
@@ -32,7 +32,7 @@ fi
 # Retrieve static web app default hostname for DNS setup
 DEFAULT_HOSTNAME=$(az staticwebapp show \
   --name "$SWA_NAME" \
-  --resource-group "$RG_NAME" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
   --query defaultHostname -o tsv)
 
 echo ""
@@ -59,7 +59,7 @@ echo " Associating custom domain '$CUSTOM_DOMAIN' with Static Web App '$SWA_NAME
 # Now that DNS is ready, set the hostname
 az staticwebapp hostname set \
   --name "$SWA_NAME" \
-  --resource-group "$RG_NAME" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
   --hostname "$CUSTOM_DOMAIN"
 
 echo ""
