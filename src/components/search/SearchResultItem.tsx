@@ -1,10 +1,11 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Text, Badge, Flex } from '@chakra-ui/react';
 
 interface SearchResultItemProps {
   item: {
     context_id: string;
     title?: string;
-    snippet: string;
+    excerpt: string;
+    score: number;
   };
   onSelect: (contextId: string) => void;
 }
@@ -13,15 +14,26 @@ export default function SearchResultItem({ item, onSelect }: SearchResultItemPro
   return (
     <Box
       borderWidth="1px"
-      p={4}
       borderRadius="md"
-      mb={3}
-      onClick={() => onSelect(item.context_id)}
+      p={5}
+      mb={4}
       cursor="pointer"
-      _hover={{ bg: 'gray.50' }}
+      _hover={{ bg: 'gray.50', shadow: 'md' }}
+      onClick={() => onSelect(item.context_id)}
+      transition="all 0.2s"
     >
-      <Text fontWeight="bold">{item.title || 'Untitled'}</Text>
-      <Text mt={1}>{item.snippet}</Text>
+      <Flex justify="space-between" align="center" mb={2}>
+        <Text fontSize="lg" fontWeight="semibold">
+          {item.title || 'Untitled'}
+        </Text>
+        <Badge colorScheme="purple" fontSize="0.8em">
+          Score: {item.score.toFixed(2)}
+        </Badge>
+      </Flex>
+
+      <Text fontSize="md" color="gray.700" noOfLines={4} whiteSpace="pre-wrap">
+        {item.excerpt}
+      </Text>
     </Box>
   );
 }
