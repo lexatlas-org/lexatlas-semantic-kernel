@@ -8,7 +8,7 @@ import SearchHistory from '../components/search/SearchHistory';
 
 import { SearchResult } from '../types/index';
 
-import { loadHistory, saveHistory, saveResults, loadResults } from '../utils/localStorage';
+import { loadHistory, saveHistory, saveResults, loadResults, removeQuery } from '../utils/localStorage';
 
 interface SearchPageProps {
   onContextSelect: (contextId: string) => void;
@@ -60,11 +60,20 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
     setLoading(false);
   };
 
+  const handleRemoveHistoryItem = (query: string) => {
+    const updated = removeQuery(query);
+    setSearchHistory(updated);
+    // optionally clear results if viewing the removed one
+    if (results.length && updated.every(q => q !== query)) {
+      setResults([]);
+    }
+  };
+
   return (
     <Box p={6}>
       <Heading size="lg" mb={4}>LexAtlas Search (docId {docId})</Heading>
       <SearchBar onSearch={search} />
-      <SearchHistory history={searchHistory} onSelect={handleHistoryClick} />
+      <SearchHistory history={searchHistory} onSelect={handleHistoryClick} onRemove={handleRemoveHistoryItem} />
 
       {loading ? <Spinner /> : results.length ? (
         <SearchResults results={results} onSelect={setDocId} />

@@ -24,3 +24,15 @@ export function loadResults(query: string): SearchResult[] {
 export function clearHistory() {
   localStorage.removeItem(HISTORY_KEY);
 }
+
+// Remove a query and its cached results
+export function removeQuery(query: string) {
+  const history = loadHistory().filter((item) => item !== query);
+  saveHistory(history);
+
+  const allResults = JSON.parse(localStorage.getItem(RESULTS_KEY) || '{}');
+  delete allResults[query];
+  localStorage.setItem(RESULTS_KEY, JSON.stringify(allResults));
+
+  return history;
+}
