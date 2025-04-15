@@ -14,12 +14,14 @@ interface SearchPageProps {
 export default function SearchPage({ onContextSelect }: SearchPageProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [docId, setDocId] = useState<string | null>(null);
 
   const search = async (query: string) => {
     setLoading(true);
     try {
       const { data } = await searchLegalContext(query);
       setResults(data.results || []);
+      onContextSelect(data.context_id || '');
     } catch {
       setResults([]);
     } finally {
@@ -29,10 +31,10 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
 
   return (
     <Box p={6}>
-      <Heading size="lg" mb={4}>LexAtlas Search</Heading>
+      <Heading size="lg" mb={4}>LexAtlas Search (docId {docId})</Heading>
       <SearchBar onSearch={search} />
       {loading ? <Spinner /> : results.length ? (
-        <SearchResults results={results} onSelect={onContextSelect} />
+        <SearchResults results={results} onSelect={setDocId} />
       ) : (
         <Text>No results found.</Text>
       )}
