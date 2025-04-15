@@ -1,11 +1,15 @@
-import { Box, Flex, Heading, Spinner, Text } from '@chakra-ui/react';
+import { Box, Flex } from '@chakra-ui/react';
 import { useEffect, useState } from 'react';
 import { searchLegalContext } from '../services/api';
-import SearchBar from '../components/search/SearchBar';
-import SearchResults from '../components/search/SearchResults';
 import SearchHistory from '../components/search/SearchHistory';
-import { loadHistory,  saveHistory,  saveResults,  loadResults,  removeQuery} from '../utils/localStorage';
-
+import SearchMain from '../components/search/SearchMain';
+import {
+  loadHistory,
+  saveHistory,
+  saveResults,
+  loadResults,
+  removeQuery,
+} from '../utils/localStorage';
 import { SearchResult } from '../types';
 
 interface SearchPageProps {
@@ -20,8 +24,7 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
   const [currentContextId, setCurrentContextId] = useState<string | null>(null);
 
   useEffect(() => {
-    const history = loadHistory();
-    setSearchHistory(history);
+    setSearchHistory(loadHistory());
   }, []);
 
   const search = async (query: string) => {
@@ -37,7 +40,6 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
       setCurrentContextId(data.context_id || '');
 
       saveResults(query, newResults, data.context_id);
-
 
       const updated = [query, ...searchHistory.filter((q) => q !== query)];
       setSearchHistory(updated.slice(0, 10));
@@ -58,7 +60,6 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
       setLoading(false);
     }
   };
-  
 
   const handleRemoveHistoryItem = (query: string) => {
     const updated = removeQuery(query);
@@ -89,17 +90,13 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
       </Box>
 
       {/* Main content */}
-      <Box flex="1" p={6}>
-        <Heading size="lg" mb={4}>LexAtlas Search (docId {docId})</Heading>
-        <SearchBar onSearch={search} />
-        {loading ? (
-          <Spinner />
-        ) : results.length ? (
-          <SearchResults results={results} onSelect={setDocId} />
-        ) : (
-          <Text color="gray.500" mt={4}>No results found.</Text>
-        )}
-      </Box>
+      <SearchMain
+        docId={docId}
+        loading={loading}
+        results={results}
+        onSearch={search}
+        onDocSelect={setDocId}
+      />
     </Flex>
   );
 }
