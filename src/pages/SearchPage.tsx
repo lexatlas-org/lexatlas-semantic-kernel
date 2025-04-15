@@ -17,6 +17,7 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
   const [loading, setLoading] = useState(false);
   const [docId, setDocId] = useState<string | null>(null);
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [currentContextId, setCurrentContextId] = useState<string | null>(null);
 
   useEffect(() => {
     const history = loadHistory();
@@ -33,6 +34,7 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
 
       setResults(newResults);
       onContextSelect(data.context_id || '');
+      setCurrentContextId(data.context_id || '');
 
       saveResults(query, newResults, data.context_id);
 
@@ -51,10 +53,12 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
     const cached = loadResults(query);
     if (cached) {
       setResults(cached.results);
-      onContextSelect(cached.context_id); // <- sets it in App.tsx
+      onContextSelect(cached.context_id);
+      setCurrentContextId(cached.context_id);
       setLoading(false);
     }
   };
+  
 
   const handleRemoveHistoryItem = (query: string) => {
     const updated = removeQuery(query);
@@ -80,6 +84,7 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
           history={searchHistory}
           onSelect={handleHistoryClick}
           onRemove={handleRemoveHistoryItem}
+          activeContextId={currentContextId}
         />
       </Box>
 
