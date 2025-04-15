@@ -1,12 +1,10 @@
 // src/components/search/SearchMain.tsx
 import { useState } from 'react';
-import { Box, Heading, Spinner, Text } from '@chakra-ui/react';
+import { Box, Heading, Text } from '@chakra-ui/react';
 import SearchBar from './SearchBar';
 import SearchResults from './SearchResults';
 import SearchHistory from './SearchHistory';
-import { saveResults } from '../../utils/localStorage';
 import { SearchResult, CachedSearch } from '../../types';
-import { searchLegalContext } from '../../services/api';
 
 interface SearchMainProps {
   onContextSelect: (contextId: string) => void;
@@ -14,38 +12,23 @@ interface SearchMainProps {
 
 export default function SearchMain({ onContextSelect }: SearchMainProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
-  const [loading, setLoading] = useState(false);
   const [currentContextId, setCurrentContextId] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
   const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
-  const handleSearch = async (query: string) => {
-    if (!query.trim()) return;
-
+  const handleSearchComplete = (results: SearchResult[], contextId: string) => {
+    setResults(results);
+    setCurrentContextId(contextId);
+    onContextSelect(contextId);
     setHasSearched(true);
-    setLoading(true);
-    try {
-      const { data } = await searchLegalContext(query);
-      const newResults = data.results || [];
-
-      setResults(newResults);
-      saveResults(query, newResults, data.context_id);
-
-      onContextSelect(data.context_id || '');
-      setCurrentContextId(data.context_id || '');
-
-      setHistoryRefreshKey((prev) => prev + 1);
-    } catch {
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
+    setHistoryRefreshKey((prev) => prev + 1);  
   };
 
   const handleHistorySelect = (item: CachedSearch) => {
     setCurrentContextId(item.context_id || '');
     onContextSelect(item.context_id || '');
     setResults(item.results || []);
+    setHasSearched(true);
   };
 
   return (
@@ -63,7 +46,7 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
         <SearchHistory
           activeContextId={currentContextId}
           onSelect={handleHistorySelect}
-          refreshTrigger={historyRefreshKey}  
+          refreshTrigger={historyRefreshKey}
         />
       </Box>
 
@@ -73,11 +56,9 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
           LexAtlas Search
         </Heading>
 
-        <SearchBar onSearch={handleSearch} />
+        <SearchBar onSearchComplete={handleSearchComplete} />
 
-        {loading ? (
-          <Spinner />
-        ) : results.length ? (
+        {results.length > 0 ? (
           <SearchResults results={results} />
         ) : hasSearched ? (
           <Text color="gray.500" mt={4}>
