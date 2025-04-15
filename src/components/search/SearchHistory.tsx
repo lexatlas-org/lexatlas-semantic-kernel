@@ -1,4 +1,6 @@
-import { Box, Text, Button, HStack } from '@chakra-ui/react';
+import { Box, Text, HStack, IconButton } from '@chakra-ui/react';
+import { LuView, LuDelete } from "react-icons/lu"
+
 import { loadResults } from '../../utils/localStorage';
 
 interface SearchHistoryProps {
@@ -40,12 +42,17 @@ export default function SearchHistory({
             >
               {query}
             </Text>
-            <Button size="xs" colorScheme="blue" onClick={() => onSelect(query)}>
-              View
-            </Button>
-            <Button size="xs" colorScheme="red" variant="outline" onClick={() => onRemove(query)}>
-              Remove
-            </Button>
+            <IconButton
+              aria-label="View"
+              size="sm"
+              onClick={() => onSelect(query)}
+            ><LuView /></IconButton>
+            <IconButton
+              aria-label="Remove"
+              size="sm"
+              onClick={() => onRemove(query)}
+              ><LuDelete /></IconButton>
+
           </HStack>
         );
       })}
