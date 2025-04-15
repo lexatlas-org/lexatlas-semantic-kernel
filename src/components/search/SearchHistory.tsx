@@ -1,38 +1,35 @@
-// src/components/search/SearchHistory.tsx
+// SearchHistory.tsx
 import { Box, Text, HStack, IconButton } from '@chakra-ui/react';
 import { LuView, LuDelete } from 'react-icons/lu';
 import { useEffect, useState } from 'react';
-
-import {
-  loadResults,
-  removeResultsByQuery,
-} from '../../utils/localStorage';
-import { CachedSearch } from '../../types';
+import { loadResults, removeResultsByQuery } from '../../utils/localStorage';
+import { useSearchStore } from '../../store/useSearchStore';
 
 interface SearchHistoryProps {
   activeContextId: string | null;
-  onSelect: (item: CachedSearch) => void;
-  refreshTrigger?: number;
+  onContextSelect: (contextId: string) => void;
 }
 
 export default function SearchHistory({
   activeContextId,
-  onSelect,
-  refreshTrigger,
+  onContextSelect,
 }: SearchHistoryProps) {
   const [history, setHistory] = useState<string[]>([]);
+  const loadCached = useSearchStore((s) => s.loadCached);
 
   useEffect(() => {
     const allKeys = Object.keys(
       JSON.parse(localStorage.getItem('lexatlas-results') || '{}')
     );
     setHistory(allKeys);
-  }, [refreshTrigger]);
+  }, [activeContextId]);
 
-  const handleSelect = (cached: CachedSearch) => {
- 
-      onSelect(cached);
- 
+  const handleSelect = (query: string) => {
+    const cached = loadResults(query);
+    if (!cached) return;
+
+    loadCached(cached);
+    onContextSelect(cached.context_id || '');
   };
 
   const handleRemove = (query: string) => {
@@ -63,21 +60,21 @@ export default function SearchHistory({
               color={isActive ? 'blue.800' : 'blue.600'}
               fontWeight={isActive ? 'bold' : 'normal'}
               cursor="pointer"
-              onClick={() => handleSelect(cached)}
+              onClick={() => handleSelect(query)}
               _hover={{ textDecoration: 'underline' }}
             >
               {query}
             </Text>
-            <IconButton
-              aria-label="View"
-              size="sm"
-              onClick={() => handleSelect(cached)}
-            ><LuView /></IconButton>
+            <IconButton aria-label="View" size="sm" onClick={() => handleSelect(query)}>
+              <LuView />
+            </IconButton>
             <IconButton
               aria-label="Remove"
               size="sm"
               onClick={() => handleRemove(query)}
-              ><LuDelete /></IconButton>
+            >
+              <LuDelete />
+            </IconButton>
           </HStack>
         );
       })}

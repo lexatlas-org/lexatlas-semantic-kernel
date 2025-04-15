@@ -1,18 +1,19 @@
-// src/components/search/SearchBar.tsx
+// SearchBar.tsx
 import { useState } from 'react';
 import { Input, IconButton, HStack, Spinner } from '@chakra-ui/react';
 import { LuSearch } from 'react-icons/lu';
 import { searchLegalContext } from '../../services/api';
 import { saveResults } from '../../utils/localStorage';
-import { SearchResult } from '../../types';
+import { useSearchStore } from '../../store/useSearchStore';
 
 interface SearchBarProps {
-  onSearchComplete: (results: SearchResult[], contextId: string) => void;
+  onContextSelect: (contextId: string) => void;
 }
 
-export default function SearchBar({ onSearchComplete }: SearchBarProps) {
+export default function SearchBar({ onContextSelect }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
+  const setResults = useSearchStore((s) => s.setResults);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -24,9 +25,10 @@ export default function SearchBar({ onSearchComplete }: SearchBarProps) {
       const contextId = data.context_id || '';
 
       saveResults(query, results, contextId);
-      onSearchComplete(results, contextId); 
+      setResults(results, contextId);
+      onContextSelect(contextId);
     } catch {
-      onSearchComplete([], '');  
+      setResults([], '');
     } finally {
       setLoading(false);
     }
@@ -46,8 +48,7 @@ export default function SearchBar({ onSearchComplete }: SearchBarProps) {
         onKeyDown={handleKeyPress}
         placeholder="Search legal topics..."
       />
-
-      <IconButton aria-label="Search" onClick={handleSearch}  >
+      <IconButton aria-label="Search" onClick={handleSearch} >
         <LuSearch />
       </IconButton>
     </HStack>

@@ -1,34 +1,20 @@
-// src/components/search/SearchMain.tsx
-import { useState } from 'react';
+// SearchMain.tsx
 import { Box, Heading, Text } from '@chakra-ui/react';
 import SearchBar from './SearchBar';
 import SearchResults from './SearchResults';
 import SearchHistory from './SearchHistory';
-import { SearchResult, CachedSearch } from '../../types';
+import { useSearchStore } from '../../store/useSearchStore';
 
 interface SearchMainProps {
   onContextSelect: (contextId: string) => void;
 }
 
 export default function SearchMain({ onContextSelect }: SearchMainProps) {
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [currentContextId, setCurrentContextId] = useState<string | null>(null);
-  const [hasSearched, setHasSearched] = useState(false);
-  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
+  const { results, contextId, hasSearched } = useSearchStore();
+  const currentContextId = contextId;
 
-  const handleSearchComplete = (results: SearchResult[], contextId: string) => {
-    setResults(results);
-    setCurrentContextId(contextId);
-    onContextSelect(contextId);
-    setHasSearched(true);
-    setHistoryRefreshKey((prev) => prev + 1);  
-  };
-
-  const handleHistorySelect = (item: CachedSearch) => {
-    setCurrentContextId(item.context_id || '');
-    onContextSelect(item.context_id || '');
-    setResults(item.results || []);
-    setHasSearched(true);
+  const handleContextUpdate = (ctxId: string) => {
+    onContextSelect(ctxId);
   };
 
   return (
@@ -45,8 +31,7 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
       >
         <SearchHistory
           activeContextId={currentContextId}
-          onSelect={handleHistorySelect}
-          refreshTrigger={historyRefreshKey}
+          onContextSelect={handleContextUpdate}
         />
       </Box>
 
@@ -56,7 +41,7 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
           LexAtlas Search
         </Heading>
 
-        <SearchBar onSearchComplete={handleSearchComplete} />
+        <SearchBar onContextSelect={handleContextUpdate} />
 
         {results.length > 0 ? (
           <SearchResults results={results} />
