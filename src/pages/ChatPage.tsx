@@ -2,27 +2,54 @@ import { Box, Heading } from '@chakra-ui/react';
 import { useState } from 'react';
 import { submitFollowUpQuery } from '../services/api';
 import FollowUpQuestionBox from '../components/chat/FollowUpQuestionBox';
-import QueryResponse from '../components/chat/QueryResponse';
-import { QueryResponse as TypeQueryResponse } from '../types'; // 👈 Add this
+import ChatMessages from '../components/chat/ChatMessages';
 
 interface ChatPageProps {
   contextId: string;
 }
 
-export default function ChatPage({ contextId }: ChatPageProps) {
+type ChatMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+};
 
-  const [response, setResponse] = useState<TypeQueryResponse | null>(null); 
+export default function ChatPage({ contextId }: ChatPageProps) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
   const ask = async (question: string, context_id: string) => {
-    const { data } = await submitFollowUpQuery(question, context_id);
-    setResponse(data);
+    // Append user message
+    const userMessage: ChatMessage = { role: 'user', content: question };
+    setMessages((prev) => [...prev, userMessage]);
+
+    // Fetch AI response
+    try {
+      const { data } = await submitFollowUpQuery(question, context_id);
+      const assistantMessage: ChatMessage = {
+        role: 'assistant',
+        content: data.answer,
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      const errorMessage: ChatMessage = {
+        role: 'assistant',
+        content: 'Something went wrong. Please try again.',
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
   };
 
   return (
     <Box p={6}>
-      <Heading size="md" mb={4}>Ask LexAgent</Heading>
+      <Heading size="md" mb={4}>
+        Ask LexAgent
+      </Heading>
+
+      {/* Message history */}
+      <ChatMessages messages={messages} />
+
+      {/* Input box */}
       <FollowUpQuestionBox contextId={contextId} onSend={ask} />
-      <QueryResponse response={response} />  
     </Box>
   );
 }
