@@ -1,12 +1,9 @@
 import SearchResultItem from './SearchResultItem';
+import { SearchResult } from '../../types/index';
 
 interface SearchResultsProps {
-  results: {
-    context_id: string;
-    title?: string;
-    snippet: string;
-  }[];
-  onSelect: (contextId: string) => void;
+  results: SearchResult[],
+  onSelect: (docId: string) => void;
 }
 
 export default function SearchResults({ results, onSelect }: SearchResultsProps) {

@@ -1,14 +1,11 @@
 import { Box, Text, Badge, Flex } from '@chakra-ui/react';
+import { SearchResult } from '../../types/index';
 
-interface SearchResultItemProps {
-  item: {
-    context_id: string;
-    title?: string;
-    excerpt: string;
-    score: number;
-  };
-  onSelect: (contextId: string) => void;
+export interface SearchResultItemProps {
+  item: SearchResult;
+  onSelect: (docId: string) => void;
 }
+
 
 export default function SearchResultItem({ item, onSelect }: SearchResultItemProps) {
   return (
@@ -19,7 +16,7 @@ export default function SearchResultItem({ item, onSelect }: SearchResultItemPro
       mb={4}
       cursor="pointer"
       _hover={{ bg: 'gray.50', shadow: 'md' }}
-      onClick={() => onSelect(item.context_id)}
+      onClick={() => onSelect(item.doc_id)}
       transition="all 0.2s"
     >
       <Flex justify="space-between" align="center" mb={2}>
@@ -31,7 +28,7 @@ export default function SearchResultItem({ item, onSelect }: SearchResultItemPro
         </Badge>
       </Flex>
 
-      <Text fontSize="md" color="gray.700" noOfLines={4} whiteSpace="pre-wrap">
+      <Text fontSize="md" color="gray.700"  whiteSpace="pre-wrap">
         {item.excerpt}
       </Text>
     </Box>

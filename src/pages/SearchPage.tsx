@@ -4,15 +4,12 @@ import { searchLegalContext } from '../services/api';
 import SearchBar from '../components/search/SearchBar';
 import SearchResults from '../components/search/SearchResults';
 
+import { SearchResult } from '../types/index';
+
 interface SearchPageProps {
   onContextSelect: (contextId: string) => void;
 }
 
-interface SearchResult {
-  context_id: string;
-  title?: string;
-  snippet: string;
-}
 
 export default function SearchPage({ onContextSelect }: SearchPageProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
