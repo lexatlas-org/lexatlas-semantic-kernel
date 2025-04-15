@@ -5,17 +5,8 @@ import SearchResults from './SearchResults';
 import SearchHistory from './SearchHistory';
 import { useSearchStore } from '../../store/useSearchStore';
 
-interface SearchMainProps {
-  onContextSelect: (contextId: string) => void;
-}
-
-export default function SearchMain({ onContextSelect }: SearchMainProps) {
+export default function SearchMain() {
   const { results, contextId, hasSearched } = useSearchStore();
-  const currentContextId = contextId;
-
-  const handleContextUpdate = (ctxId: string) => {
-    onContextSelect(ctxId);
-  };
 
   return (
     <Box display="flex" width="100%">
@@ -29,10 +20,7 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
         position="sticky"
         top={0}
       >
-        <SearchHistory
-          activeContextId={currentContextId}
-          onContextSelect={handleContextUpdate}
-        />
+        <SearchHistory activeContextId={contextId} />
       </Box>
 
       {/* Main content */}
@@ -41,7 +29,7 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
           LexAtlas Search
         </Heading>
 
-        <SearchBar onContextSelect={handleContextUpdate} />
+        <SearchBar />
 
         {results.length > 0 ? (
           <SearchResults results={results} />

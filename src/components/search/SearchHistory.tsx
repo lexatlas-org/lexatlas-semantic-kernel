@@ -7,29 +7,23 @@ import { useSearchStore } from '../../store/useSearchStore';
 
 interface SearchHistoryProps {
   activeContextId: string | null;
-  onContextSelect: (contextId: string) => void;
 }
 
-export default function SearchHistory({
-  activeContextId,
-  onContextSelect,
-}: SearchHistoryProps) {
+export default function SearchHistory({ activeContextId }: SearchHistoryProps) {
   const [history, setHistory] = useState<string[]>([]);
   const loadCached = useSearchStore((s) => s.loadCached);
 
   useEffect(() => {
-    const allKeys = Object.keys(
+    const keys = Object.keys(
       JSON.parse(localStorage.getItem('lexatlas-results') || '{}')
     );
-    setHistory(allKeys);
+    setHistory(keys);
   }, [activeContextId]);
 
   const handleSelect = (query: string) => {
     const cached = loadResults(query);
     if (!cached) return;
-
     loadCached(cached);
-    onContextSelect(cached.context_id || '');
   };
 
   const handleRemove = (query: string) => {
@@ -65,16 +59,17 @@ export default function SearchHistory({
             >
               {query}
             </Text>
-            <IconButton aria-label="View" size="sm" onClick={() => handleSelect(query)}>
-              <LuView />
-            </IconButton>
+            <IconButton
+              aria-label="View"
+              size="sm"
+              onClick={() => handleSelect(query)}
+            ><LuView /></IconButton>
+
             <IconButton
               aria-label="Remove"
               size="sm"
               onClick={() => handleRemove(query)}
-            >
-              <LuDelete />
-            </IconButton>
+            ><LuDelete /></IconButton>
           </HStack>
         );
       })}

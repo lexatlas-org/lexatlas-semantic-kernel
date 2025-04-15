@@ -1,15 +1,16 @@
+// SearchResults.tsx
 import SearchResultItem from './SearchResultItem';
-import { SearchResult } from '../../types/index';
+import { SearchResult } from '../../types';
 
-interface SearchResultsProps {
-  results: SearchResult[],
+interface Props {
+  results: SearchResult[];
 }
 
-export default function SearchResults({ results }: SearchResultsProps) {
+export default function SearchResults({ results }: Props) {
   return (
     <>
-      {results.map((item, i) => (
-        <SearchResultItem key={i} item={item}  />
+      {results.map((item, index) => (
+        <SearchResultItem key={index} item={item} />
       ))}
     </>
   );

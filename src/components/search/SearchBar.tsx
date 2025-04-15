@@ -1,16 +1,12 @@
 // SearchBar.tsx
 import { useState } from 'react';
-import { Input, IconButton, HStack, Spinner } from '@chakra-ui/react';
+import { Input, IconButton, HStack } from '@chakra-ui/react';
 import { LuSearch } from 'react-icons/lu';
 import { searchLegalContext } from '../../services/api';
 import { saveResults } from '../../utils/localStorage';
 import { useSearchStore } from '../../store/useSearchStore';
 
-interface SearchBarProps {
-  onContextSelect: (contextId: string) => void;
-}
-
-export default function SearchBar({ onContextSelect }: SearchBarProps) {
+export default function SearchBar() {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const setResults = useSearchStore((s) => s.setResults);
@@ -26,17 +22,10 @@ export default function SearchBar({ onContextSelect }: SearchBarProps) {
 
       saveResults(query, results, contextId);
       setResults(results, contextId);
-      onContextSelect(contextId);
     } catch {
       setResults([], '');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
     }
   };
 
@@ -45,12 +34,14 @@ export default function SearchBar({ onContextSelect }: SearchBarProps) {
       <Input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        onKeyDown={handleKeyPress}
+        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
         placeholder="Search legal topics..."
       />
-      <IconButton aria-label="Search" onClick={handleSearch} >
-        <LuSearch />
-      </IconButton>
+      <IconButton
+        aria-label="Search"
+        onClick={handleSearch}
+        ><LuSearch /></IconButton>
+      
     </HStack>
   );
 }
