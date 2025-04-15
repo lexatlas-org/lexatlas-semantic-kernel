@@ -1,17 +1,11 @@
 // src/components/search/SearchMain.tsx
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Box, Heading, Spinner, Text } from '@chakra-ui/react';
 import SearchBar from './SearchBar';
 import SearchResults from './SearchResults';
 import SearchHistory from './SearchHistory';
-import {
-  loadHistory,
-  saveHistory,
-  saveResults,
-  loadResults,
-  removeQuery,
-} from '../../utils/localStorage';
-import { SearchResult } from '../../types';
+import { saveResults } from '../../utils/localStorage';
+import { SearchResult, CachedSearch } from '../../types';
 import { searchLegalContext } from '../../services/api';
 
 interface SearchMainProps {
@@ -21,30 +15,26 @@ interface SearchMainProps {
 export default function SearchMain({ onContextSelect }: SearchMainProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [docId, setDocId] = useState<string | null>(null);
-  const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [currentContextId, setCurrentContextId] = useState<string | null>(null);
-
-  useEffect(() => {
-    setSearchHistory(loadHistory());
-  }, []);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0); // ✅ NEW
 
   const search = async (query: string) => {
     if (!query.trim()) return;
 
+    setHasSearched(true);
     setLoading(true);
     try {
       const { data } = await searchLegalContext(query);
       const newResults = data.results || [];
 
       setResults(newResults);
-      onContextSelect(data.context_id || '');
-      setCurrentContextId(data.context_id || '');
       saveResults(query, newResults, data.context_id);
 
-      const updated = [query, ...searchHistory.filter((q) => q !== query)];
-      setSearchHistory(updated.slice(0, 10));
-      saveHistory(updated);
+      onContextSelect(data.context_id || '');
+      setCurrentContextId(data.context_id || '');
+
+      setHistoryRefreshKey((prev) => prev + 1); // ✅ trigger SearchHistory refresh
     } catch {
       setResults([]);
     } finally {
@@ -52,22 +42,10 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
     }
   };
 
-  const handleHistoryClick = (query: string) => {
-    const cached = loadResults(query);
-    if (cached) {
-      setResults(cached.results);
-      onContextSelect(cached.context_id);
-      setCurrentContextId(cached.context_id);
-      setLoading(false);
-    }
-  };
-
-  const handleRemoveHistoryItem = (query: string) => {
-    const updated = removeQuery(query);
-    setSearchHistory(updated);
-    if (results.length && query === searchHistory[0]) {
-      setResults([]);
-    }
+  const handleHistorySelect = (item: CachedSearch) => {
+    setCurrentContextId(item.context_id || '');
+    onContextSelect(item.context_id || '');
+    setResults(item.results || []);
   };
 
   return (
@@ -83,28 +61,29 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
         top={0}
       >
         <SearchHistory
-          history={searchHistory}
-          onSelect={handleHistoryClick}
-          onRemove={handleRemoveHistoryItem}
           activeContextId={currentContextId}
+          onSelect={handleHistorySelect}
+          refreshTrigger={historyRefreshKey} // ✅ passed to update history
         />
       </Box>
 
       {/* Main content */}
       <Box flex="1" p={6}>
         <Heading size="lg" mb={4}>
-          LexAtlas Search {docId && `(docId ${docId})`}
+          LexAtlas Search
         </Heading>
+
         <SearchBar onSearch={search} />
+
         {loading ? (
           <Spinner />
         ) : results.length ? (
-          <SearchResults results={results} onSelect={setDocId} />
-        ) : (
+          <SearchResults results={results} onSelect={search} />
+        ) : hasSearched ? (
           <Text color="gray.500" mt={4}>
             No results found.
           </Text>
-        )}
+        ) : null}
       </Box>
     </Box>
   );
