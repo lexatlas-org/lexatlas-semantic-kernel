@@ -3,14 +3,13 @@ import { SearchResult } from '../../types/index';
 
 interface SearchResultsProps {
   results: SearchResult[],
-  onSelect: (docId: string) => void;
 }
 
-export default function SearchResults({ results, onSelect }: SearchResultsProps) {
+export default function SearchResults({ results }: SearchResultsProps) {
   return (
     <>
       {results.map((item, i) => (
-        <SearchResultItem key={i} item={item} onSelect={onSelect} />
+        <SearchResultItem key={i} item={item}  />
       ))}
     </>
   );

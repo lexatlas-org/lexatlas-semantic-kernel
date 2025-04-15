@@ -3,11 +3,9 @@ import { SearchResult } from '../../types/index';
 
 export interface SearchResultItemProps {
   item: SearchResult;
-  onSelect: (docId: string) => void;
 }
 
-
-export default function SearchResultItem({ item, onSelect }: SearchResultItemProps) {
+export default function SearchResultItem({ item }: SearchResultItemProps) {
   return (
     <Box
       borderWidth="1px"
@@ -16,7 +14,6 @@ export default function SearchResultItem({ item, onSelect }: SearchResultItemPro
       mb={4}
       cursor="pointer"
       _hover={{ bg: 'gray.50', shadow: 'md' }}
-      onClick={() => onSelect(item.doc_id)}
       transition="all 0.2s"
     >
       <Flex justify="space-between" align="center" mb={2}>

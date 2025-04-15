@@ -17,9 +17,9 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
   const [loading, setLoading] = useState(false);
   const [currentContextId, setCurrentContextId] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
-  const [historyRefreshKey, setHistoryRefreshKey] = useState(0); // ✅ NEW
+  const [historyRefreshKey, setHistoryRefreshKey] = useState(0);
 
-  const search = async (query: string) => {
+  const handleSearch = async (query: string) => {
     if (!query.trim()) return;
 
     setHasSearched(true);
@@ -34,7 +34,7 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
       onContextSelect(data.context_id || '');
       setCurrentContextId(data.context_id || '');
 
-      setHistoryRefreshKey((prev) => prev + 1); // ✅ trigger SearchHistory refresh
+      setHistoryRefreshKey((prev) => prev + 1);
     } catch {
       setResults([]);
     } finally {
@@ -63,7 +63,7 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
         <SearchHistory
           activeContextId={currentContextId}
           onSelect={handleHistorySelect}
-          refreshTrigger={historyRefreshKey} // ✅ passed to update history
+          refreshTrigger={historyRefreshKey}  
         />
       </Box>
 
@@ -73,12 +73,12 @@ export default function SearchMain({ onContextSelect }: SearchMainProps) {
           LexAtlas Search
         </Heading>
 
-        <SearchBar onSearch={search} />
+        <SearchBar onSearch={handleSearch} />
 
         {loading ? (
           <Spinner />
         ) : results.length ? (
-          <SearchResults results={results} onSelect={search} />
+          <SearchResults results={results} />
         ) : hasSearched ? (
           <Text color="gray.500" mt={4}>
             No results found.
