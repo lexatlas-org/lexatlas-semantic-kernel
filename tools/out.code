@@ -1,0 +1,557 @@
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/vite-env.d.ts
+
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+    readonly VITE_API_BASE_URL: string;
+    readonly VITE_API_KEY: string;
+    // Add more env vars here if needed
+  }
+  
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/index.css
+
+
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/App.tsx
+
+import { Container } from '@chakra-ui/react';
+import { useState } from 'react';
+import SearchPage from './pages/SearchPage';
+import ChatPage from './pages/ChatPage';
+
+export default function App() {
+  const [contextId, setContextId] = useState<string | null>(null);
+
+  return (
+    <Container maxW="container.md" mt={10}> (contenxtId is {contextId})
+    {/* <SearchPage onContextSelect={setContextId} /> */}
+      {!contextId
+        ? <SearchPage onContextSelect={setContextId} />
+        : <ChatPage contextId={contextId} />
+      }
+    </Container>
+  );
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/pages/ChatPage.tsx
+
+import { Box, Heading } from '@chakra-ui/react';
+import { useState } from 'react';
+import { submitFollowUpQuery } from '../services/api';
+import FollowUpQuestionBox from '../components/chat/FollowUpQuestionBox';
+import QueryResponse from '../components/chat/QueryResponse';
+
+interface ChatPageProps {
+  contextId: string;
+}
+
+export default function ChatPage({ contextId }: ChatPageProps) {
+  const [response, setResponse] = useState<{ answer: string } | null>(null);
+
+  const ask = async (question: string, context_id: string) => {
+    const { data } = await submitFollowUpQuery(question, context_id);
+    setResponse(data);
+  };
+
+  return (
+    <Box p={6}>
+      <Heading size="md" mb={4}>Ask LexAgent</Heading>
+      <FollowUpQuestionBox contextId={contextId} onSend={ask} />
+      <QueryResponse response={response} />  
+    </Box>
+  );
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/pages/SearchPage.tsx
+
+import { Box, Flex, Heading, Spinner, Text } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { searchLegalContext } from '../services/api';
+import SearchBar from '../components/search/SearchBar';
+import SearchResults from '../components/search/SearchResults';
+import SearchHistory from '../components/search/SearchHistory';
+import { loadHistory,  saveHistory,  saveResults,  loadResults,  removeQuery} from '../utils/localStorage';
+
+import { SearchResult } from '../types';
+
+interface SearchPageProps {
+  onContextSelect: (contextId: string) => void;
+}
+
+export default function SearchPage({ onContextSelect }: SearchPageProps) {
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [docId, setDocId] = useState<string | null>(null);
+  const [searchHistory, setSearchHistory] = useState<string[]>([]);
+  const [currentContextId, setCurrentContextId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const history = loadHistory();
+    setSearchHistory(history);
+  }, []);
+
+  const search = async (query: string) => {
+    if (!query.trim()) return;
+
+    setLoading(true);
+    try {
+      const { data } = await searchLegalContext(query);
+      const newResults = data.results || [];
+
+      setResults(newResults);
+      onContextSelect(data.context_id || '');
+      setCurrentContextId(data.context_id || '');
+
+      saveResults(query, newResults, data.context_id);
+
+
+      const updated = [query, ...searchHistory.filter((q) => q !== query)];
+      setSearchHistory(updated.slice(0, 10));
+      saveHistory(updated);
+    } catch {
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleHistoryClick = (query: string) => {
+    const cached = loadResults(query);
+    if (cached) {
+      setResults(cached.results);
+      onContextSelect(cached.context_id);
+      setCurrentContextId(cached.context_id);
+      setLoading(false);
+    }
+  };
+  
+
+  const handleRemoveHistoryItem = (query: string) => {
+    const updated = removeQuery(query);
+    setSearchHistory(updated);
+    if (results.length && query === searchHistory[0]) {
+      setResults([]);
+    }
+  };
+
+  return (
+    <Flex>
+      {/* Sidebar */}
+      <Box
+        width="250px"
+        p={4}
+        borderRight="1px solid #e2e8f0"
+        bg="gray.50"
+        minH="100vh"
+        position="sticky"
+        top={0}
+      >
+        <SearchHistory
+          history={searchHistory}
+          onSelect={handleHistoryClick}
+          onRemove={handleRemoveHistoryItem}
+          activeContextId={currentContextId}
+        />
+      </Box>
+
+      {/* Main content */}
+      <Box flex="1" p={6}>
+        <Heading size="lg" mb={4}>LexAtlas Search (docId {docId})</Heading>
+        <SearchBar onSearch={search} />
+        {loading ? (
+          <Spinner />
+        ) : results.length ? (
+          <SearchResults results={results} onSelect={setDocId} />
+        ) : (
+          <Text color="gray.500" mt={4}>No results found.</Text>
+        )}
+      </Box>
+    </Flex>
+  );
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/schemas/querySchema.ts
+
+import { z } from 'zod';
+
+export const querySchema = z.object({
+  question: z.string().min(5, 'Question is too short'),
+  context_id: z.string().min(1, 'Missing context'),
+});
+
+export type QueryInput = z.infer<typeof querySchema>;
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/services/api.ts
+
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL,
+  headers: {
+    'X-API-Key': import.meta.env.VITE_API_KEY,
+    Accept: 'application/json',
+  },
+});
+
+export const searchLegalContext = (query: string, topK = 5) =>
+  api.get(`/search`, {
+    params: { q: query, top_k: topK },
+  });
+
+export const submitFollowUpQuery = (question: string, context_id: string) =>
+  api.post('/query', { question, context_id });
+
+export const uploadDocument = (formData: FormData) =>
+  api.post('/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+
+export default api;
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/App.css
+
+
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/components/chat/QueryResponse.tsx
+
+import { Box, Text } from '@chakra-ui/react';
+
+interface QueryResponseProps {
+  response: { answer: string } | null;
+}
+
+export default function QueryResponse({ response }: QueryResponseProps) {
+  if (!response) return null;
+  return (
+    <Box mt={4} p={4} borderWidth="1px" borderRadius="md"> responsessssssssssss
+      <Text whiteSpace="pre-wrap">{response.answer}</Text>
+    </Box>
+  );
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/components/chat/FollowUpQuestionBox.tsx
+
+import { VStack, Textarea, Button } from '@chakra-ui/react';
+import { useState } from 'react';
+import { querySchema } from '../../schemas/querySchema';
+
+interface FollowUpQuestionBoxProps {
+  contextId: string;
+  onSend: (question: string, context_id: string) => void;
+}
+
+export default function FollowUpQuestionBox({ contextId, onSend }: FollowUpQuestionBoxProps) {
+  const [question, setQuestion] = useState('');
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = () => {
+    try {
+      const validated = querySchema.parse({ question, context_id: contextId });
+      onSend(validated.question, validated.context_id);
+      setQuestion('');
+      setError(null);
+    } catch (err: any) {
+      setError(err.errors?.[0]?.message);
+    }
+  };
+
+  return (
+    <VStack spacing={3} align="stretch">
+      <Textarea
+        value={question}
+        onChange={(e) => setQuestion(e.target.value)}
+        placeholder="Ask a legal question..."
+      />
+      {error && <p>{error}</p>}
+      <Button colorScheme="teal" onClick={handleSubmit}>Ask</Button>
+    </VStack>
+  );
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/components/search/SearchResults.tsx
+
+import SearchResultItem from './SearchResultItem';
+import { SearchResult } from '../../types/index';
+
+interface SearchResultsProps {
+  results: SearchResult[],
+  onSelect: (docId: string) => void;
+}
+
+export default function SearchResults({ results, onSelect }: SearchResultsProps) {
+  return (
+    <>
+      {results.map((item, i) => (
+        <SearchResultItem key={i} item={item} onSelect={onSelect} />
+      ))}
+    </>
+  );
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/components/search/SearchHistory.tsx
+
+import { Box, Text, HStack, IconButton } from '@chakra-ui/react';
+import { LuView, LuDelete } from "react-icons/lu"
+
+import { loadResults } from '../../utils/localStorage';
+
+interface SearchHistoryProps {
+  history: string[];
+  onSelect: (query: string) => void;
+  onRemove: (query: string) => void;
+  activeContextId: string | null;
+}
+
+export default function SearchHistory({
+  history,
+  onSelect,
+  onRemove,
+  activeContextId,
+}: SearchHistoryProps) {
+  return (
+    <Box mb={6}>
+      {history.map((query, index) => {
+        const cached = loadResults(query);
+        const isActive = cached?.context_id === activeContextId;
+
+        return (
+          <HStack
+            key={index}
+            justify="space-between"
+            py={1}
+            bg={isActive ? 'blue.50' : 'transparent'}
+            borderRadius="md"
+            px={2}
+          >
+            <Text
+              flex="1"
+              fontSize="sm"
+              color={isActive ? 'blue.800' : 'blue.600'}
+              fontWeight={isActive ? 'bold' : 'normal'}
+              cursor="pointer"
+              onClick={() => onSelect(query)}
+              _hover={{ textDecoration: 'underline' }}
+            >
+              {query}
+            </Text>
+            <IconButton
+              aria-label="View"
+              size="sm"
+              onClick={() => onSelect(query)}
+            ><LuView /></IconButton>
+            <IconButton
+              aria-label="Remove"
+              size="sm"
+              onClick={() => onRemove(query)}
+              ><LuDelete /></IconButton>
+
+          </HStack>
+        );
+      })}
+    </Box>
+  );
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/components/search/SearchResultItem.tsx
+
+import { Box, Text, Badge, Flex } from '@chakra-ui/react';
+import { SearchResult } from '../../types/index';
+
+export interface SearchResultItemProps {
+  item: SearchResult;
+  onSelect: (docId: string) => void;
+}
+
+
+export default function SearchResultItem({ item, onSelect }: SearchResultItemProps) {
+  return (
+    <Box
+      borderWidth="1px"
+      borderRadius="md"
+      p={5}
+      mb={4}
+      cursor="pointer"
+      _hover={{ bg: 'gray.50', shadow: 'md' }}
+      onClick={() => onSelect(item.doc_id)}
+      transition="all 0.2s"
+    >
+      <Flex justify="space-between" align="center" mb={2}>
+        <Text fontSize="lg" fontWeight="semibold">
+          {item.title || 'Untitled'}
+        </Text>
+        <Badge colorScheme="purple" fontSize="0.8em">
+          Score: {item.score.toFixed(2)}
+        </Badge>
+      </Flex>
+
+      <Text fontSize="md" color="gray.700"  whiteSpace="pre-wrap">
+        {item.excerpt}
+      </Text>
+    </Box>
+  );
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/components/search/SearchBar.tsx
+
+import { Input, IconButton, HStack } from '@chakra-ui/react';
+import { LuSearch } from "react-icons/lu"
+import { useState } from 'react';
+
+interface SearchBarProps {
+  onSearch: (query: string) => void;
+}
+
+export default function SearchBar({ onSearch }: SearchBarProps) {
+  const [query, setQuery] = useState('');
+  return (
+    <HStack mb={4}>
+      <Input
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        placeholder="Search legal topics..."
+      />
+      <IconButton
+        aria-label="Search"
+        onClick={() => onSearch(query)}
+      >
+        <LuSearch />
+      </IconButton>
+    </HStack>
+  );
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/main.tsx
+
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { ChakraProvider } from '@chakra-ui/react';
+import { BrowserRouter } from 'react-router-dom';
+import { system } from "@chakra-ui/react/preset";
+
+import App from './App';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <ChakraProvider value={system}> 
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
+    </ChakraProvider>
+  </React.StrictMode>
+);
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/types/index.ts
+
+// Search result item
+export interface SearchResult {
+  title: string;
+  excerpt: string;
+  score: number;
+  doc_id: string;
+}
+
+// Full search response
+export interface SearchResponse {
+  context_id: string;
+  results: SearchResult[];
+  source: string;
+  timestamp: string;
+}
+
+// Query request payload
+export interface QueryRequest {
+  question: string;
+  context_id: string;
+}
+
+// Query response from LLM
+export interface QueryResponse {
+  answer: string;
+  source: string;
+  used_chunks: string[];
+  timestamp: string;
+}
+
+// Upload response payload
+export interface UploadResponse {
+  status: string;
+  filename: string;
+  doc_id: string;
+  message: string;
+}
+
+export interface CachedSearch {
+  results: SearchResult[];
+  context_id: string;
+}
+
+-----------------------------
+Content of /home/ohroot/Desktop/project/AZ-Hackathon/lexatlas/lexatlas-frontend/src/utils/localStorage.ts
+
+import { SearchResult } from '../types';
+import { CachedSearch } from '../types/index';
+
+const HISTORY_KEY = 'lexatlas-history';
+const RESULTS_KEY = 'lexatlas-results';
+
+export function loadHistory(): string[] {
+  return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+}
+
+export function saveHistory(history: string[]) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+}
+
+
+export function clearHistory() {
+  localStorage.removeItem(HISTORY_KEY);
+}
+
+// Remove a query and its cached results
+export function removeQuery(query: string) {
+  const history = loadHistory().filter((item) => item !== query);
+  saveHistory(history);
+
+  const allResults = JSON.parse(localStorage.getItem(RESULTS_KEY) || '{}');
+  delete allResults[query];
+  localStorage.setItem(RESULTS_KEY, JSON.stringify(allResults));
+
+  return history;
+}
+
+
+export function saveResults(query: string, results: SearchResult[], context_id: string) {
+  const allResults: Record<string, CachedSearch> =
+    JSON.parse(localStorage.getItem(RESULTS_KEY) || '{}');
+
+  allResults[query] = { results, context_id };
+  localStorage.setItem(RESULTS_KEY, JSON.stringify(allResults));
+}
+
+export function loadResults(query: string): CachedSearch | null {
+  const allResults: Record<string, CachedSearch> =
+    JSON.parse(localStorage.getItem(RESULTS_KEY) || '{}');
+
+  return allResults[query] || null;
+}

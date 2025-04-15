@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { QueryResponse } from '../types';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -13,8 +14,12 @@ export const searchLegalContext = (query: string, topK = 5) =>
     params: { q: query, top_k: topK },
   });
 
-export const submitFollowUpQuery = (question: string, context_id: string) =>
-  api.post('/query', { question, context_id });
+export const submitFollowUpQuery = async (
+  question: string,
+  context_id: string
+): Promise<{ data: QueryResponse }> => {
+  return api.post('/query', { question, context_id });
+};
 
 export const uploadDocument = (formData: FormData) =>
   api.post('/upload', formData, {

@@ -1,4 +1,4 @@
-import { VStack, Textarea, Button, FormErrorMessage } from '@chakra-ui/react';
+import { VStack, Textarea, Button } from '@chakra-ui/react';
 import { useState } from 'react';
 import { querySchema } from '../../schemas/querySchema';
 
@@ -23,13 +23,13 @@ export default function FollowUpQuestionBox({ contextId, onSend }: FollowUpQuest
   };
 
   return (
-    <VStack spacing={3} align="stretch">
+    <VStack align="stretch">
       <Textarea
         value={question}
         onChange={(e) => setQuestion(e.target.value)}
         placeholder="Ask a legal question..."
       />
-      {error && <FormErrorMessage>{error}</FormErrorMessage>}
+      {error && <p>{error}</p>}
       <Button colorScheme="teal" onClick={handleSubmit}>Ask</Button>
     </VStack>
   );
