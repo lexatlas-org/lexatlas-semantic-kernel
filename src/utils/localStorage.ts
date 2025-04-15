@@ -1,4 +1,5 @@
 import { SearchResult } from '../types';
+import { CachedSearch } from '../types/index';
 
 const HISTORY_KEY = 'lexatlas-history';
 const RESULTS_KEY = 'lexatlas-results';
@@ -11,16 +12,7 @@ export function saveHistory(history: string[]) {
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 }
 
-export function saveResults(query: string, results: SearchResult[]) {
-  const allResults = JSON.parse(localStorage.getItem(RESULTS_KEY) || '{}');
-  allResults[query] = results;
-  localStorage.setItem(RESULTS_KEY, JSON.stringify(allResults));
-}
 
-export function loadResults(query: string): SearchResult[] {
-  const allResults = JSON.parse(localStorage.getItem(RESULTS_KEY) || '{}');
-  return allResults[query] || [];
-}
 export function clearHistory() {
   localStorage.removeItem(HISTORY_KEY);
 }
@@ -35,4 +27,20 @@ export function removeQuery(query: string) {
   localStorage.setItem(RESULTS_KEY, JSON.stringify(allResults));
 
   return history;
+}
+
+
+export function saveResults(query: string, results: SearchResult[], context_id: string) {
+  const allResults: Record<string, CachedSearch> =
+    JSON.parse(localStorage.getItem(RESULTS_KEY) || '{}');
+
+  allResults[query] = { results, context_id };
+  localStorage.setItem(RESULTS_KEY, JSON.stringify(allResults));
+}
+
+export function loadResults(query: string): CachedSearch | null {
+  const allResults: Record<string, CachedSearch> =
+    JSON.parse(localStorage.getItem(RESULTS_KEY) || '{}');
+
+  return allResults[query] || null;
 }

@@ -35,3 +35,8 @@ export interface UploadResponse {
   doc_id: string;
   message: string;
 }
+
+export interface CachedSearch {
+  results: SearchResult[];
+  context_id: string;
+}

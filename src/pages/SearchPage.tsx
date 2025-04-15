@@ -34,7 +34,8 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
       setResults(newResults);
       onContextSelect(data.context_id || '');
 
-      saveResults(query, newResults);
+      saveResults(query, newResults, data.context_id);
+
 
       const updated = [query, ...searchHistory.filter((q) => q !== query)];
       setSearchHistory(updated.slice(0, 10));
@@ -48,8 +49,11 @@ export default function SearchPage({ onContextSelect }: SearchPageProps) {
 
   const handleHistoryClick = (query: string) => {
     const cached = loadResults(query);
-    setResults(cached);
-    setLoading(false);
+    if (cached) {
+      setResults(cached.results);
+      onContextSelect(cached.context_id); // <- sets it in App.tsx
+      setLoading(false);
+    }
   };
 
   const handleRemoveHistoryItem = (query: string) => {
