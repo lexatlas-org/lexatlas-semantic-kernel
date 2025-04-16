@@ -8,13 +8,13 @@ import { useSearchStore } from '../../store/useSearchStore';
 
 export default function SearchBar() {
   const [query, setQuery] = useState('');
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const setResults = useSearchStore((s) => s.setResults);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
 
-    setLoading(true);
+    // setLoading(true);
     try {
       const { data } = await searchLegalContext(query);
       const results = data.results || [];
@@ -25,7 +25,7 @@ export default function SearchBar() {
     } catch {
       setResults([], '');
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 

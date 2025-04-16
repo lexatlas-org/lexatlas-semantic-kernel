@@ -11,7 +11,7 @@ interface ChatMessagesProps {
 
 export default function ChatMessages({ messages }: ChatMessagesProps) {
   return (
-    <VStack spacing={4} align="stretch" mt={4}>
+    <VStack align="stretch" mt={4}>
       {messages.map((msg, idx) => (
         <Box
           key={idx}

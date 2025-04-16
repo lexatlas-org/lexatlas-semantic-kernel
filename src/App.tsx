@@ -1,4 +1,4 @@
-import { Container, ButtonGroup, Button, Box, Text } from '@chakra-ui/react';
+import { Container, ButtonGroup, Button, Box } from '@chakra-ui/react';
 import { useState } from 'react';
 import SearchPage from './pages/SearchPage';
 import ChatPage from './pages/ChatPage';

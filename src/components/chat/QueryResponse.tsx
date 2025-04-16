@@ -1,4 +1,4 @@
-import { Box, Text, Code, VStack, Heading } from '@chakra-ui/react';
+import { Box, Text, Code, Heading } from '@chakra-ui/react';
 import { QueryResponse as TypeQueryResponse } from '../../types';
 
 interface QueryResponseProps {
