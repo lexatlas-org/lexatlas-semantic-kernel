@@ -1,0 +1,100 @@
+# local with flask run
+@base_url=http://127.0.0.1:8000
+
+# @base_url=https://lexatlas-api-cdh3cghdc6eyc8gy.eastus2-01.azurewebsites.net/
+
+@base_url=https://api.lexatlas.cloud/
+
+
+@api_key=supersecuredevtoken
+ 
+# -----------------------------------------------------------------------------
+# Test Unauthorized Access
+###
+GET {{base_url}}
+X-API-Key: badtoken
+Content-Type: application/json
+Accept: application/json
+
+# Test Authenticated Access 
+###
+GET {{base_url}}
+X-API-Key: {{api_key}}
+Content-Type: application/json
+Accept: application/json
+
+# -----------------------------------------------------------------------------
+# SEARCH endpoints
+# -----------------------------------------------------------------------------
+# Perform search for legal context
+
+### 
+# @name search
+GET {{base_url}}/search?q=nonprofit%20New%20York&top_k=5
+X-API-Key: {{api_key}}
+Content-Type: application/json
+Accept: application/json
+
+
+# -----------------------------------------------------------------------------
+# QUERY endpoints
+# -----------------------------------------------------------------------------
+
+###
+# @name query
+POST {{base_url}}/query
+X-API-Key: {{api_key}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "question": "Summary the information",
+  "context_id": "{{search.response.body.context_id}}"
+}
+
+
+###
+# @name query
+POST {{base_url}}/query
+X-API-Key: {{api_key}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "question": "How is New York? My question is about hotels.",
+  "context_id": "{{search.response.body.context_id}}"
+}
+
+
+# -----------------------------------------------------------------------------
+# POST endpoints
+# -----------------------------------------------------------------------------
+### Upload legal document
+POST {{base_url}}/upload
+X-API-Key: {{api_key}}
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="201801.pdf"
+Content-Type: application/pdf
+
+< ../data/reviews/201801.pdf
+--WebAppBoundary
+Content-Disposition: form-data; name="title"
+
+Test Document
+--WebAppBoundary
+Content-Disposition: form-data; name="user_id"
+
+demo_user
+--WebAppBoundary--
+
+
+
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
