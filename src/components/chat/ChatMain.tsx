@@ -1,33 +1,22 @@
-// src/components/chat/ChatMain.tsx
-import { useState } from 'react';
+// ChatMain.tsx
 import { Heading } from '@chakra-ui/react';
 import ChatMessages from './ChatMessages';
 import FollowUpQuestionBox from './FollowUpQuestionBox';
 import { submitFollowUpQuery } from '../../services/api';
+import { useChatStore } from '../../store/useChatStore';
 
-type ChatMessage = {
-  role: 'user' | 'assistant';
-  content: string;
-};
-
-interface ChatMainProps {
-  contextId: string;
-}
-
-export default function ChatMain({ contextId }: ChatMainProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+export default function ChatMain() {
+  const { messages, addUserMessage, addAssistantMessage,} = useChatStore();
+  
 
   const handleSend = async (question: string, context_id: string) => {
-    setMessages((prev) => [...prev, { role: 'user', content: question }]);
+    addUserMessage(question);
 
     try {
       const { data } = await submitFollowUpQuery(question, context_id);
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.answer }]);
+      addAssistantMessage(data.answer);
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: 'Something went wrong. Please try again.' },
-      ]);
+      addAssistantMessage('Something went wrong. Please try again.');
     }
   };
 
@@ -38,7 +27,7 @@ export default function ChatMain({ contextId }: ChatMainProps) {
       </Heading>
 
       <ChatMessages messages={messages} />
-      <FollowUpQuestionBox contextId={contextId} onSend={handleSend} />
+      <FollowUpQuestionBox onSend={handleSend} />
     </>
   );
 }

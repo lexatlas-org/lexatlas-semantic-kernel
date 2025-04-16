@@ -1,4 +1,3 @@
-// SearchMain.tsx
 import { Box, Heading, Text } from '@chakra-ui/react';
 import SearchBar from './SearchBar';
 import SearchResults from './SearchResults';

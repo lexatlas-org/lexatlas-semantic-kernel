@@ -1,14 +1,10 @@
-// src/pages/ChatPage.tsx
 import { Box } from '@chakra-ui/react';
 import ChatMain from '../components/chat/ChatMain';
 
-interface ChatPageProps {
-  contextId: string;
-}
 
-export default function ChatPage({ contextId }: ChatPageProps) {
+export default function ChatPage() {
   return (
   <Box p={6}>
-    <ChatMain contextId={contextId} />;
+    <ChatMain />;
   </Box>)
 }
