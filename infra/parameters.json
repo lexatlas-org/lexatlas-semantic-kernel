@@ -1,0 +1,67 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "serverName": {
+            "value": "mg-rag01-postgresql"
+        },
+        "location": {
+            "value": "eastus2"
+        },
+        "serverEdition": {
+            "value": "Burstable"
+        },
+        "storageSizeGB": {
+            "value": 32
+        },
+        "haEnabled": {
+            "value": "Disabled"
+        },
+        "backupRetentionDays": {
+            "value": 7
+        },
+        "geoRedundantBackup": {
+            "value": "Disabled"
+        },
+        "availabilityZone": {
+            "value": ""
+        },
+        "vmName": {
+            "value": "Standard_B1ms"
+        },
+        "standbyAvailabilityZone": {
+            "value": ""
+        },
+        "firewallRules": {
+            "value": {
+                "rules": []
+            }
+        },
+        "network": {
+            "value": {
+                "publicNetworkAccess": "Enabled"
+            }
+        },
+        "tags": {
+            "value": {}
+        },
+        "version": {
+            "value": "16"
+        },
+        "administratorLogin": {
+            "value": "mgrag01"
+        },
+        "administratorLoginPassword": {
+            "value": null
+        },
+        "apiVersion": {
+            "value": "2024-11-01-preview"
+        },
+        "storageAutogrow": {
+            "value": "Disabled"
+        },
+        "iopsTier": {
+            "value": "P4"
+        }
+    }
+}
