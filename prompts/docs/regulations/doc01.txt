@@ -1,0 +1,4 @@
+Document ID: doc_001
+ Title: New York Renewable Energy Siting Law §94-c
+ Summary: Expedites siting and permitting for major renewable energy projects over 25 MW through a centralized Office of Renewable Energy Siting (ORES) in New York State.
+

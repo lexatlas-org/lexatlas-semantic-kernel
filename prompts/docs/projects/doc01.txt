@@ -1,0 +1,4 @@
+Document ID: doc_001
+ Title: New York Renewable Energy Siting Law §94-c
+ Summary: Projects building renewable energy facilities over 25 MW must obtain a permit from the Office of Renewable Energy Siting (ORES) before construction begins. Failure to secure approval results in regulatory noncompliance.
+

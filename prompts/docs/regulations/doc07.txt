@@ -1,0 +1,4 @@
+Document ID: doc_007
+ Title: Texas Renewable Portfolio Standard §39.904
+ Summary: Sets minimum renewable energy generation targets for utilities operating in Texas; promotes wind and solar projects across the state.
+

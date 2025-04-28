@@ -1,0 +1,4 @@
+Document ID: doc_003
+ Title: Florida Electrical Power Plant Siting Act §403.501
+ Summary: New power plants over 75 MW must conduct a full Environmental Impact Assessment as part of the centralized licensing process. Missing the assessment results in siting application rejection.
+

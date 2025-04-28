@@ -1,0 +1,4 @@
+Document ID: doc_009
+ Title: Florida Brownfields Redevelopment Act §376.80
+ Summary: Redeveloping brownfield sites in Florida requires an executed Brownfield Site Rehabilitation Agreement (BSRA) filed with the Department of Environmental Protection (DEP). Lack of agreement violates site rehabilitation rules.
+

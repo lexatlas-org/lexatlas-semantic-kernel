@@ -1,0 +1,4 @@
+Document ID: doc_005
+ Title: California Carbon Capture and Sequestration Protocol §95800
+ Summary: Carbon capture sites must establish continuous monitoring and demonstrate effective CO₂ containment for final project certification. Failure leads to regulatory penalties and loss of project licensing.
+

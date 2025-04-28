@@ -1,0 +1,4 @@
+Document ID: doc_007
+ Title: New York Environmental Protection Fund (EPF) §54-0101
+ Summary: Infrastructure projects funded by EPF grants must submit certified resilience plans addressing climate risks. Missing plans may disqualify projects from receiving funding.
+

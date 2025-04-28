@@ -1,0 +1,3 @@
+Document ID: doc_003
+ Title: Florida Electrical Power Plant Siting Act §403.501
+ Summary: Creates a centralized process for approving large power plants in Florida, ensuring environmental impacts are considered during licensing.

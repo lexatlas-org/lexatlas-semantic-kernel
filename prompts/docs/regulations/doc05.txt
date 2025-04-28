@@ -1,0 +1,3 @@
+Document ID: doc_005
+ Title: California Carbon Capture and Sequestration Protocol §95800
+ Summary: Establishes CO2 injection site permitting, monitoring, and compliance requirements under the California Cap-and-Trade system for carbon capture projects.

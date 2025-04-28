@@ -1,0 +1,4 @@
+Document ID: doc_004
+ Title: New York Brownfield Cleanup Program §27-1400
+ Summary: Projects redeveloping brownfield sites must adhere strictly to Department of Environmental Conservation (DEC) remediation agreements to qualify for liability protections. Noncompliance may void protections.
+
