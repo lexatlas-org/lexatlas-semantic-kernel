@@ -14,7 +14,7 @@ ROOT_DIR = get_root_dir()
 async def main():
     client = get_project_client()
 
-    agent_id = "asst_tkcxfBRgzYP1rhMIHmU64qFH"  # Replace with your actual agent ID
+    agent_id = "asst_tkcxfBRgzYP1rhMIHmU64qFH"  # RegulationRetriever
     agent = get_agent_by_id(client, agent_id)
 
     print(f"Running agent: {agent.name} with ID: {agent.id}")
@@ -23,6 +23,14 @@ async def main():
     file_paths = [
         ROOT_DIR / "prompts" / "docs" / "regulations" / "doc01.txt",
         ROOT_DIR / "prompts" / "docs" / "regulations" / "doc02.txt",
+        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc03.txt",
+        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc04.txt",
+        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc05.txt",
+        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc06.txt",
+        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc07.txt",
+        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc08.txt",
+        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc09.txt",
+        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc10.txt",
     ]
         
     vector_store_name = "my_vector_store"
