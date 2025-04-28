@@ -1,0 +1,48 @@
+# Chainlit specific files
+.chainlit/
+*.chainlit.log
+
+# Python related
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.bak
+*.tmp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Prisma related
+prisma/.env
+prisma/migrations/
+
+
+# Node.js related
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+build/
+.cache/
+*.tsbuildinfo
+ 
+
+ *.zip
