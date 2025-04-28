@@ -1,5 +1,6 @@
 # agent_utils.py
 
+import json
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -10,6 +11,9 @@ from IPython.display import display, Image
 # ========== Load Environment ==========
 DIR_ROOT = Path(__file__).parent
 load_dotenv(dotenv_path=DIR_ROOT / ".env", override=True)
+
+def get_root_dir() -> Path:
+    return DIR_ROOT
 
 # ========== Client Setup ==========
 def get_project_client(connection_string: str = None) -> AIProjectClient:
@@ -44,15 +48,37 @@ async def run_query(
     return client.agents.list_messages(thread.id)
 
 # ========== Display Responses ==========
-def display_responses(messages):
-    print("Assistant Response:")
-    for msg in messages:
-        if getattr(msg, 'role', '') == "assistant":
-            content = getattr(msg, 'content', '')
+# def display_responses(messages):
+#     print("Assistant Response:")
+#     for msg in messages:
+#         if getattr(msg, 'role', '') == "assistant":
+#             content = getattr(msg, 'content', '')
+#             if isinstance(content, list):
+#                 for part in content:
+#                     if getattr(part, 'type', '') == "text":
+#                         print(part.text.value)
+#             elif isinstance(content, str):
+#                 print(content)
+
+def display_responses(messages: dict):
+    print("\nAssistant Responses:\n")
+    
+    if not messages or 'data' not in messages:
+        print("No messages found.")
+        return
+
+    for msg in messages['data']:
+        if msg.get('role') == "assistant":
+            content = msg.get('content', [])
             if isinstance(content, list):
                 for part in content:
-                    if getattr(part, 'type', '') == "text":
-                        print(part.text.value)
+                    if part.get('type') == "text":
+                        text_value = part.get('text', {}).get('value', '')
+                        try:
+                            parsed = json.loads(text_value)
+                            print(json.dumps(parsed, indent=4))
+                        except json.JSONDecodeError:
+                            print(text_value)
             elif isinstance(content, str):
                 print(content)
 
@@ -86,3 +112,28 @@ def read_file_content(file_path: Path) -> str:
         raise FileNotFoundError(f"The file {file_path} does not exist.")
     with file_path.open("r", encoding="utf-8") as file:
         return file.read()
+    
+# ========== Get Agent by ID ==========
+def get_agent_by_id(client: AIProjectClient, agent_id: str):
+    try:
+        agent = client.agents.get_agent(agent_id)
+        return agent
+    except Exception as e:
+        print(f"Error retrieving agent with ID {agent_id}: {e}")
+        return None
+    
+# ========== Read All Files and Join Content ==========
+def read_all_files_and_join(directory: Path) -> str:
+    if not directory.is_dir():
+        raise NotADirectoryError(f"{directory} is not a valid directory.")
+    
+    content = []
+    for file_path in directory.glob("**/*"):
+        if file_path.is_file():
+            try:
+                with file_path.open("r", encoding="utf-8") as file:
+                    content.append(file.read())
+            except Exception as e:
+                print(f"Error reading file {file_path}: {e}")
+    
+    return "\n".join(content)
