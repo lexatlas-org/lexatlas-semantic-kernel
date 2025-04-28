@@ -1,0 +1,6 @@
+chainlit
+openai     
+python-dotenv   
+psycopg2-binary   
+sqlalchemy   
+semantic-kernel
