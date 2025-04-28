@@ -1,6 +1,7 @@
 # main.py
 import asyncio
 from pathlib import Path
+import time
 from agent_utils import (
     get_project_client,
     create_agent_and_thread,
@@ -9,29 +10,34 @@ from agent_utils import (
 
 DIR_ROOT = Path(__file__).parent
 
-
-agents = [
-    {'name': 'ClassifierAgent',      'model':'gpt-35-turbo', 'instructions':f"{DIR_ROOT}/prompts/1_ClassifierAgentPrompt.txt"},
-    {'name': 'RegulationRetriever',  'model':'gpt-35-turbo', 'instructions':f"{DIR_ROOT}/prompts/2_RegulationRetrieverAgentPrompt.txt"},
-    {'name': 'ComplianceChecker',    'model':'gpt-4o-mini', 'instructions':f"{DIR_ROOT}/prompts/3_ComplianceCheckerAgentPrompt.txt"},
-    {'name': 'ReportGenerator',      'model':'gpt-4o', 'instructions':f"{DIR_ROOT}/prompts/4_ReportGeneratorAgentPrompt.txt"},
+agents_config = [
+    {'name': 'ClassifierAgent',      'model': 'gpt-4o-mini',  'instructions': DIR_ROOT / "prompts/1_ClassifierAgentPrompt.txt"},
+    {'name': 'RegulationRetriever',  'model': 'gpt-4o-mini',  'instructions': DIR_ROOT / "prompts/2_RegulationRetrieverAgentPrompt.txt"},
+    {'name': 'ComplianceChecker',    'model': 'gpt-4o-mini',  'instructions': DIR_ROOT / "prompts/3_ComplianceCheckerAgentPrompt.txt"},
+    {'name': 'ReportGenerator',      'model': 'gpt-4o-mini', 'instructions': DIR_ROOT / "prompts/4_ReportGeneratorAgentPrompt.txt"},
 ]
-# print(agents)
 
+async def main():
+    client = get_project_client()
 
-client = get_project_client()
-for agent in agents:
-    print(f"Creating agent: {agent['name']} with model: {agent['model']}")
-    instructions = read_file_content(Path(agent['instructions']))
+    with client:
+        for agent_info in agents_config:
+            print(f"Creating agent: {agent_info['name']} with model: {agent_info['model']}")
+            
+            # Read the instructions from file
+            instructions_content = read_file_content(agent_info['instructions'])
 
-    agent, thread = await create_agent_and_thread(
-        client,
-        model_name="gpt-4o-mini",
-        agent_name="my-test-agent",
-        instructions="You are a very friendly assistant."
-    )
+            # Create agent and thread
+            agent, thread = await create_agent_and_thread(
+                client,
+                model_name=agent_info['model'],
+                agent_name=agent_info['name'],
+                instructions=instructions_content
+            )
 
-    print(f"Agent {agent['name']} created successfully.")
-    print(f"Thread {thread['id']} created successfully.")
+            print(f"Agent '{agent_info['name']}' created successfully.")
+            print(f"Thread ID: {thread.id} created successfully.")
+            time.sleep(5)
 
-
+if __name__ == "__main__":
+    asyncio.run(main())
