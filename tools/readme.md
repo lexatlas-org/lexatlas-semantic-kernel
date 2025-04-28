@@ -6,6 +6,8 @@ chainlit run main.py --host 0.0.0.0 --port 443
 
 ```
 
+see https://github.com/JasonHaley/chainlit-openai-assistantsapi-aca-starter 
+
 
 ```bash
 # ssh connect
