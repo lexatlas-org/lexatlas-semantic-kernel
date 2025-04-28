@@ -60,7 +60,13 @@ jobs:
 
       - name: Unzip artifact for deployment
         run: unzip release.zip
-
+                
+      - name: Create .env file from GitHub Secrets
+        run: |
+          echo "LITERAL_API_KEY=${{ secrets.LITERAL_API_KEY }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "CHAINLIT_AUTH_SECRET=${{ secrets.CHAINLIT_AUTH_SECRET }}" >> .env
+ 
       
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
