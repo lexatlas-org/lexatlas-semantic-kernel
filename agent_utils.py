@@ -61,12 +61,12 @@ async def run_query(
 #             elif isinstance(content, str):
 #                 print(content)
 
-def display_responses(messages: dict):
-    print("\nAssistant Responses:\n")
-    
+
+def extract_responses(messages: dict):
+    extracted_responses = []
+
     if not messages or 'data' not in messages:
-        print("No messages found.")
-        return
+        return extracted_responses
 
     for msg in messages['data']:
         if msg.get('role') == "assistant":
@@ -77,11 +77,15 @@ def display_responses(messages: dict):
                         text_value = part.get('text', {}).get('value', '')
                         try:
                             parsed = json.loads(text_value)
-                            print(json.dumps(parsed, indent=4))
+                            pretty_text = json.dumps(parsed, indent=4)
+                            extracted_responses.append(pretty_text)
                         except json.JSONDecodeError:
-                            print(text_value)
+                            extracted_responses.append(text_value)
             elif isinstance(content, str):
-                print(content)
+                extracted_responses.append(content)
+
+    return extracted_responses
+
 
 # ========== Handle Images ==========
 def handle_images(client: AIProjectClient, messages, save_dir: Path = Path("./images")):
