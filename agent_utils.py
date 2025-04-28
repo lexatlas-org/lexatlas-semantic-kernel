@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from IPython.display import display, Image
+from azure.ai.projects.models import FileSearchTool, OpenAIFile, VectorStore
 
 # ========== Load Environment ==========
 DIR_ROOT = Path(__file__).parent
@@ -139,8 +140,8 @@ def read_all_files_and_join(directory: Path) -> str:
     return "\n".join(content)
 
 
-# ========== Upload Files and Create Vector Store ==========
-async def upload_multiple_files_and_create_vector_store(client, file_paths: list[str], vector_store_name: str):
+# ========== Upload Files and Create FileSearchTool ==========
+def upload_files_create_vector_store_return_tool(client, file_paths: list[str], vector_store_name: str):
     if not file_paths:
         raise ValueError("file_paths list is empty!")
 
@@ -152,12 +153,23 @@ async def upload_multiple_files_and_create_vector_store(client, file_paths: list
         file_ids.append(file.id)
         print(f"Uploaded: {file.id}")
 
-    print("\nCreating vector store with uploaded files...")
-    vector_store = client.agents.create_vector_store_and_poll(  # <-- NO await
-        file_ids=file_ids,
+    print("\nCreating empty vector store...")
+    vector_store = client.agents.create_vector_store_and_poll(
+        data_sources=[],  # Important: Create empty first
         name=vector_store_name
     )
-    print(f"Vector store created: {vector_store.name} (ID: {vector_store.id})")
+    print(f"Created vector store: {vector_store.name} (ID: {vector_store.id})")
 
-    return vector_store
+    print("\nAdding files to vector store...")
+    vector_store_file_batch = client.agents.create_vector_store_file_batch_and_poll(
+        vector_store_id=vector_store.id,
+        file_ids=file_ids
+    )
+    print(f"Created file batch: {vector_store_file_batch.id}")
+
+    print("\nSetting up FileSearchTool...")
+    file_search_tool = FileSearchTool(vector_store_ids=[vector_store.id])
+
+    return file_search_tool
+
 
