@@ -137,3 +137,27 @@ def read_all_files_and_join(directory: Path) -> str:
                 print(f"Error reading file {file_path}: {e}")
     
     return "\n".join(content)
+
+
+# ========== Upload Files and Create Vector Store ==========
+async def upload_multiple_files_and_create_vector_store(client, file_paths: list[str], vector_store_name: str):
+    if not file_paths:
+        raise ValueError("file_paths list is empty!")
+
+    file_ids = []
+
+    for path in file_paths:
+        print(f"Uploading file: {path}...")
+        file = client.agents.upload_file_and_poll(file_path=path, purpose="assistants")
+        file_ids.append(file.id)
+        print(f"Uploaded: {file.id}")
+
+    print("\nCreating vector store with uploaded files...")
+    vector_store = client.agents.create_vector_store_and_poll(  # <-- NO await
+        file_ids=file_ids,
+        name=vector_store_name
+    )
+    print(f"Vector store created: {vector_store.name} (ID: {vector_store.id})")
+
+    return vector_store
+
