@@ -4,6 +4,7 @@ from pathlib import Path
 
 import chainlit as cl
 from dotenv import load_dotenv
+import json
 
 from typing import Optional
 
@@ -53,7 +54,7 @@ async def on_chat_start():
     cl.user_session.set("chat_history", [])
 
     # Inform user
-    await cl.Message(content="✅ Agent group initialized. Please start sending your project description.").send()
+    await cl.Message(content=" Agent group initialized. Please start sending your project description.").send()
 
 
 @cl.on_message
@@ -61,28 +62,55 @@ async def on_message(message: cl.Message):
     group_chat = cl.user_session.get("group_chat")  # type: Optional[AgentGroupChat]
 
     if group_chat is None:
-        await cl.Message(content="❌ Error: Agent group is not initialized. Please restart the chat.").send()
+        await cl.Message(content=" Error: Agent group is not initialized. Please restart the chat.").send()
         return
 
-    # Prepare user input
+    # Add user message
     user_message = ChatMessageContent(
         role=AuthorRole.USER,
         items=[TextContent(text=message.content)]
     )
-
-    # Add message to conversation
     await group_chat.add_chat_message(user_message)
 
-    # Create Chainlit message to stream agent outputs
     chainlit_message = cl.Message(content="")
 
-    # Loop through agents' responses
     async for content in group_chat.invoke():
-        if content.content:
-            await chainlit_message.stream_token(f"\n\n[{content.name or 'Agent'}]: {content.content}")
+        agent_name = content.name or "Agent"
+        raw = content.content or ""
+        formatted_output = ""
 
-    # Finalize message
+        try:
+            # --- ClassifierAgent: Markdown table ---
+            if agent_name == "ClassifierAgent" and "| Document ID" in raw:
+                formatted_output = f"###  Project Classification\n\n{raw}"
+
+            # --- RegulationRetriever: Markdown regulation table with optional note ---
+            elif agent_name == "RegulationRetriever" and "| Title" in raw:
+                formatted_output = f"###  Relevant Regulations\n\n{raw}"
+
+            elif agent_name == "ComplianceChecker":
+                if "**Compliance Status:** No issues detected" in raw:
+                    formatted_output = f"### Compliance Check\n\n{raw}"
+                elif "| Risk or Issue" in raw:
+                    formatted_output = f"###  Compliance Issues\n\n{raw}"
+                else:
+                    formatted_output = f"###  Compliance Output\n\n{raw}"
+
+            # --- ReportGenerator: Final legal report ---
+            elif agent_name == "ReportGenerator" and "# Final Legal Advisory Report" in raw:
+                formatted_output = raw  # already complete Markdown
+
+            # --- Fallback for unknown agent outputs ---
+            else:
+                formatted_output = f"###  {agent_name}\n\n{raw}"
+
+        except Exception as e:
+            formatted_output = f"###  {agent_name} Output Error\n\n Could not format output.\n\n**Error:** {str(e)}\n\n**Raw Output:**\n```\n{raw}\n```"
+
+        await chainlit_message.stream_token(f"\n\n{formatted_output}")
+
     await chainlit_message.send()
+
 
 
 @cl.on_chat_end
