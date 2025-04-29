@@ -23,7 +23,7 @@ async def main():
 
     # -------------------------------------------------------------------------
     #  Phase 1 - Classify Projects
-    agent_classifier = get_agent_by_name(client, 'ClassifierAgent')
+    agent_classifier = await get_agent_by_name(client, 'ClassifierAgent')
 
     thread_classifier = client.agents.create_thread()
 
@@ -41,7 +41,7 @@ async def main():
 
     # -------------------------------------------------------------------------
     # Phase 2 - Retrieve Project Information
-    agent_retriever = get_agent_by_name(client, 'RegulationRetriever')
+    agent_retriever = await get_agent_by_name(client, 'RegulationRetriever')
     thread_retriever = client.agents.create_thread()
     message_retriever = client.agents.create_message(
         thread_id=thread_retriever.id,
@@ -59,7 +59,7 @@ async def main():
 
     # -------------------------------------------------------------------------
     # Phase 3 - Compliance Check
-    agent_checker = get_agent_by_name(client, 'ComplianceChecker')
+    agent_checker = await get_agent_by_name(client, 'ComplianceChecker')
     thread_checker = client.agents.create_thread()
     message_checker = client.agents.create_message(
         thread_id=thread_checker.id,
@@ -81,7 +81,7 @@ async def main():
 
     # -------------------------------------------------------------------------
     # Phase 4 - Generate Report
-    agent_reporter = get_agent_by_name(client, 'ReportGenerator')
+    agent_reporter = await get_agent_by_name(client, 'ReportGenerator')
     thread_reporter = client.agents.create_thread()
     message_reporter = client.agents.create_message(
         thread_id=thread_reporter.id,
