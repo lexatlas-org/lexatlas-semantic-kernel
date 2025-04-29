@@ -11,32 +11,9 @@ from openai import AsyncOpenAI
 
 # Load environment variables
 load_dotenv()
-SERPAPI_SEARCH_API_KEY = os.environ.get("SERPAPI_SEARCH_API_KEY")
-SERPAPI_SEARCH_ENDPOINT = "https://serpapi.com/search"
 
-# Define the Compliance Plugin
-class CompliancePlugin:
-    """Plugin to retrieve legal and regulatory compliance data using SerpApi Google Search"""
+from plugins.compliance_plugin import CompliancePlugin  # 👈 Import plugin
 
-    @kernel_function(description="Check legal or regulatory compliance based on a project description.")
-    def check_compliance(self, query: Annotated[str, "User's project description or legal query"]) -> Annotated[str, "Returns search-based legal insights or regulatory information"]:
-        params = {
-            "engine": "google",
-            "q": query,
-            "hl": "en",
-            "gl": "us",
-            "api_key": SERPAPI_SEARCH_API_KEY
-        }
-
-        response = requests.get(SERPAPI_SEARCH_ENDPOINT, params=params)
-        if response.status_code == 200:
-            results = response.json().get("organic_results", [])
-            formatted = "\n".join(
-                f"- {r.get('title')}: {r.get('link')}" for r in results[:5]
-            )
-            return formatted if formatted else "No relevant results found."
-        else:
-            return f"Error: HTTP {response.status_code}"
 
 # Setup OpenAI client
 client = AsyncOpenAI(
