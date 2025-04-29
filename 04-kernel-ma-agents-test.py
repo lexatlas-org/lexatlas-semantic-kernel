@@ -79,6 +79,29 @@ async def main():
     print("\n\n\nCompliance Check:", compliance_check)
   
 
+    # -------------------------------------------------------------------------
+    # Phase 4 - Generate Report
+    agent_reporter = get_agent_by_name(client, 'ReportGenerator')
+    thread_reporter = client.agents.create_thread()
+    message_reporter = client.agents.create_message(
+        thread_id=thread_reporter.id,
+        role="user",
+        content= f"""
+            Projects: {project} 
+            
+            Classifier Outputs: {projects_classified} 
+            
+            Project Information: {project_info} 
+            
+            Compliance Check: {compliance_check} 
+            
+            Please generate a report for the projects.""",
+    )
+    run = client.agents.create_and_process_run(thread_id=thread_reporter.id, agent_id=agent_reporter.id)
+    messages_reporter = client.agents.list_messages(thread_id=thread_reporter.id)
+    report = extract_responses(messages_reporter)
+    print("\n\n\nReport:", report)
+
 if __name__ == "__main__":
     asyncio.run(main())
 
