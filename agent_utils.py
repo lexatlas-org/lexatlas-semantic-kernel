@@ -199,37 +199,26 @@ _agent_cache = None
 
 async def get_agent_by_name(client: AIProjectClient, agent_name: str):
     global _agent_cache
-
-    try:
-        if _agent_cache is None:
-            _agent_cache = client.agents.list_agents()
-
-        for agent in _agent_cache.data:
-            if agent.name == agent_name:
-                return agent
-
-        print(f" No agent found with the name '{agent_name}'.")
-        return None
-    except Exception as e:
-        print(f" Error retrieving agent with name '{agent_name}': {e}")
-        return None
-
-        
-        
+ 
+    if _agent_cache is None:
+        _agent_cache = await client.agents.list_agents()
     
+    for agent in _agent_cache.data:
+        if agent.name == agent_name:
+            return agent
 
+    print(f" No agent found with the name '{agent_name}'.")
+    return None
+ 
 # ========== Get Classifier Agent ==========
 async def get_azure_agent_by_name(client: AIProjectClient, agent_name: str):
-    try:
-        agent_def = await get_agent_by_name(client, agent_name)
-        if not agent_def:
-            raise ValueError("ClassifierAgent not found.")
+    agent_def = await get_agent_by_name(client, agent_name)
+    if not agent_def:
+        raise ValueError(f"{agent_name} not found.")
+    
+    agent = AzureAIAgent(client=client, definition=agent_def)
+    return agent
         
-        agent = AzureAIAgent(client=client, definition=agent_def)
-        return agent
-        
-    except Exception as e:
-        print(f"Error retrieving agent with name {agent_name}: {e}")
-        return None
+ 
     
  
