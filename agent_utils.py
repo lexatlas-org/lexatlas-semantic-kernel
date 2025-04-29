@@ -215,8 +215,8 @@ async def get_agent_by_name(client: AIProjectClient, agent_name: str, wait: bool
 
  
 # ========== Get Classifier Agent ==========
-async def get_azure_agent_by_name(client: AIProjectClient, agent_name: str):
-    agent_def = await get_agent_by_name(client, agent_name, wait=True)
+async def get_azure_agent_by_name(client: AIProjectClient, agent_name: str, wait: bool = True):
+    agent_def = await get_agent_by_name(client, agent_name, wait=wait)
     if not agent_def:
         raise ValueError(f"{agent_name} not found.")
     
