@@ -9,6 +9,8 @@ from azure.identity import DefaultAzureCredential
 from IPython.display import display, Image
 from azure.ai.projects.models import FileSearchTool, OpenAIFile, VectorStore
 
+from config import agents_config  
+
 # ========== Load Environment ==========
 DIR_ROOT = Path(__file__).parent
 load_dotenv(dotenv_path=DIR_ROOT / ".env", override=True)
@@ -182,3 +184,16 @@ def list_all_files_in_folder(folder_path: Path) -> list[str]:
         raise NotADirectoryError(f"{folder_path} is not a valid directory.")
     
     return [str(file.resolve()) for file in folder_path.glob("**/*") if file.is_file()]
+
+
+# ========== Get Agent by Name ==========
+def get_agent_by_name(client: AIProjectClient, agent_name: str):
+    try:
+        for agent in agents_config:
+            if agent['name'] == agent_name:
+                return get_agent_by_id(client, agent['id'])
+        print(f"No agent found with the name {agent_name}.")
+        return None
+    except Exception as e:
+        print(f"Error retrieving agent with name {agent_name}: {e}")
+        return None
