@@ -26,9 +26,13 @@ AZURE_STORAGE_ACCOUNT_NAME=${STG_INPUT:-$AZURE_STORAGE_ACCOUNT_NAME}
 read -p "Blob container name [default: $AZURE_STORAGE_CONTAINER]: " CONTAINER_INPUT
 AZURE_STORAGE_CONTAINER=${CONTAINER_INPUT:-$AZURE_STORAGE_CONTAINER}
 
-read -p "Storage account key [default: hidden]: " -s KEY_INPUT
-echo ""
-AZURE_STORAGE_ACCOUNT_KEY=${KEY_INPUT:-$AZURE_STORAGE_ACCOUNT_KEY}
+# read -p "Storage account key [default: hidden]: " -s KEY_INPUT
+# echo ""
+# AZURE_STORAGE_ACCOUNT_KEY=${KEY_INPUT:-$AZURE_STORAGE_ACCOUNT_KEY}
+AZURE_STORAGE_ACCOUNT_KEY=$(az storage account keys list \
+  --account-name "$AZURE_STORAGE_ACCOUNT_NAME" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
+  --query "[0].value" -o tsv)
 
 
 read -p "Local folder path to upload [default: $FOLDER_DATA]: " FOLDER_INPUT

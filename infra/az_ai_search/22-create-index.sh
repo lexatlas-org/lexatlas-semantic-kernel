@@ -62,64 +62,67 @@ read -p "Indexer name [default: $AZURE_SEARCH_INDEXER]: " INDEXER_INPUT
 AZURE_SEARCH_INDEXER=${INDEXER_INPUT:-$AZURE_SEARCH_INDEXER}
 
 
+AZURE_AISERVICE_KEY=$(az cognitiveservices account keys list \
+  --name "$AZURE_AISERVICE_NAME" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
+  --query "key1" -o tsv)
+
 AZURE_SEARCH_ENDPOINT="https://${AZURE_SEARCH_NAME}.search.windows.net"
 AZURE_SEARCH_KEY=$(az search admin-key show \
   --service-name "$AZURE_SEARCH_NAME" \
   --resource-group "$AZURE_RESOURCE_GROUP" \
   --query "primaryKey" -o tsv)
-
+  
  export AZURE_LOCATION AZURE_RESOURCE_GROUP AZURE_SUBSCRIPTION_ID AZURE_STORAGE_ACCOUNT_NAME \
         AZURE_STORAGE_CONTAINER AZURE_STORAGE_ACCOUNT_KEY AZURE_AISERVICE_NAME AZURE_AISERVICE_KEY \
         AZURE_SEARCH_NAME AZURE_SEARCH_KEY AZURE_SEARCH_INDEX AZURE_SEARCH_DATASOURCE AZURE_SEARCH_INDEXER \
         AZURE_SEARCH_SKILLSET AZURE_SEARCH_SEMANTIC_CONFIG_NAME AZURE_OPENAI_NAME AZURE_OPENAI_DEPLOYMENT \
         AZURE_OPENAI_MODEL_NAME AZURE_OPENAI_MODEL_VERSION AZURE_OPENAI_ENDPOINT AZURE_OPENAI_KEY
 
-echo $AZURE_SEARCH_KEY
 
 # 01 - CREATE DATA SOURCE
 # Get connection string from Azure Storage
-# AZURE_STORAGE_CONNECTION_STRING=$(az storage account show-connection-string \
-#   --name "$AZURE_STORAGE_ACCOUNT_NAME" \
-#   --resource-group "$AZURE_RESOURCE_GROUP" \
-#   --query "connectionString" -o tsv)
+AZURE_STORAGE_CONNECTION_STRING=$(az storage account show-connection-string \
+  --name "$AZURE_STORAGE_ACCOUNT_NAME" \
+  --resource-group "$AZURE_RESOURCE_GROUP" \
+  --query "connectionString" -o tsv)
 
-# echo "Creating Data Source for AI Search..."
-# az rest --method PUT --uri "https://$AZURE_SEARCH_NAME.search.windows.net/datasources/$AZURE_SEARCH_DATASOURCE?api-version=2023-11-01" \
-#         --headers "Content-Type=application/json" "api-key=$AZURE_SEARCH_KEY" \
-#         --body '{
-#             "name": "'"$AZURE_SEARCH_DATASOURCE"'",
-#             "type": "azureblob",
-#             "credentials": { "connectionString": "'"$AZURE_STORAGE_CONNECTION_STRING"'" },
-#             "container": { "name": "'"$AZURE_STORAGE_CONTAINER"'" }
-#         }'
+echo "Creating Data Source for AI Search..."
+az rest --method PUT --uri "https://$AZURE_SEARCH_NAME.search.windows.net/datasources/$AZURE_SEARCH_DATASOURCE?api-version=2023-07-01-Preview" \
+        --headers "Content-Type=application/json" "api-key=$AZURE_SEARCH_KEY" \
+        --body '{
+            "name": "'"$AZURE_SEARCH_DATASOURCE"'",
+            "type": "azureblob",
+            "credentials": { "connectionString": "'"$AZURE_STORAGE_CONNECTION_STRING"'" },
+            "container": { "name": "'"$AZURE_STORAGE_CONTAINER"'" }
+        }'
 
-# echo "Data Source '$AZURE_SEARCH_DATASOURCE' successfully created."
-  
-
+echo "Data Source '$AZURE_SEARCH_DATASOURCE' successfully created."
+ 
 # 02 - CREATE SKILLSET
 envsubst  < ./schema/skillset.json > /tmp/skillset.json
 # cat /tmp/skillset.json 
 az rest --method POST \
-    --uri "https://$AZURE_SEARCH_NAME.search.windows.net/skillsets?api-version=2023-11-01" \
+    --uri "https://$AZURE_SEARCH_NAME.search.windows.net/skillsets?api-version=2023-07-01-Preview" \
     --headers "Content-Type=application/json" "api-key=$AZURE_SEARCH_KEY" \
     --body @/tmp/skillset.json
 echo "Skillset '$AZURE_SEARCH_SKILLSET' successfully created."
 
-# # 03 - CREATE INDEX
-# envsubst  < ./schema/index.json > /tmp/index.json
-# # cat /tmp/index.json
-# az rest --method POST \
-#     --uri "https://$AZURE_SEARCH_NAME.search.windows.net/indexes?api-version=2023-11-01" \
-#     --headers "Content-Type=application/json" "api-key=$AZURE_SEARCH_KEY" \
-#     --body @/tmp/index.json
-# echo "Index '$AZURE_SEARCH_INDEX' successfully created."
+# 03 - CREATE INDEX
+envsubst  < ./schema/index.json > /tmp/index.json
+# cat /tmp/index.json
+az rest --method POST \
+    --uri "https://$AZURE_SEARCH_NAME.search.windows.net/indexes?api-version=2023-07-01-Preview" \
+    --headers "Content-Type=application/json" "api-key=$AZURE_SEARCH_KEY" \
+    --body @/tmp/index.json
+echo "Index '$AZURE_SEARCH_INDEX' successfully created."
 
-# # 04 - CREATE INDEXER
-# envsubst  < ./schema/indexer.json > /tmp/indexer.json
-# # cat /tmp/indexer.json
-# az rest --method POST \
-#     --uri "https://$AZURE_SEARCH_NAME.search.windows.net/indexers?api-version=2023-11-01" \
-#     --headers "Content-Type=application/json" "api-key=$AZURE_SEARCH_KEY" \
-#     --body @/tmp/indexer.json
-# echo "Indexer '$AZURE_SEARCH_INDEXER' successfully created."
+# 04 - CREATE INDEXER
+envsubst  < ./schema/indexer.json > /tmp/indexer.json
+# cat /tmp/indexer.json
+az rest --method POST \
+    --uri "https://$AZURE_SEARCH_NAME.search.windows.net/indexers?api-version=2023-07-01-Preview" \
+    --headers "Content-Type=application/json" "api-key=$AZURE_SEARCH_KEY" \
+    --body @/tmp/indexer.json
+echo "Indexer '$AZURE_SEARCH_INDEXER' successfully created."
 
