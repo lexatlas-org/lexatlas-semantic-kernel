@@ -2,7 +2,7 @@
 import asyncio
 import time
 from agent_utils import (
-    display_responses,
+    extract_responses,
     get_project_client,
     get_agent_by_id,
     get_root_dir,
@@ -21,37 +21,45 @@ project =  """
 async def main():
     client = get_project_client()
 
-    with client:
-        for agent_config in agents_config:
-            if agent_config['name'] != "ClassifierAgent":
-                continue
+    # -------------------------------------------------------------------------
+    #  Phase 1 - Classify Projects
+    agent_id = "asst_tluMzunuZZ21J1R35fFwCvj0"  # ClassifierAgent
+    agent_classifier = get_agent_by_id(client, agent_id)
 
-            agent = get_agent_by_id(client, agent_config["id"])
-            if agent is None:
-                continue
+    thread_classifier = client.agents.create_thread()
 
-            print(f"Running agent: {agent_config['name']} with ID: {agent.id}")
+    message_classifier = client.agents.create_message(
+        thread_id=thread_classifier.id,
+        role="user",
+        content=project,
+    )
 
-            if agent_config['name'] == "ClassifierAgent":
-                # user_query = project 
-                user_query =  projects 
-            elif agent_config['name'] == "RegulationRetriever":
-                user_query = project
+    run = client.agents.create_and_process_run(thread_id=thread_classifier.id, agent_id=agent_classifier.id)
 
+    messages_classifier = client.agents.list_messages(thread_id=thread_classifier.id)
+    projects_classified = extract_responses(messages_classifier)
+    print("Classified Projects:", projects_classified)
 
-            thread = client.agents.create_thread()
+    # -------------------------------------------------------------------------
+    # Phase 2 - Retrieve Project Information
+    agent_id = "asst_tkcxfBRgzYP1rhMIHmU64qFH"  # RegulationRetriever
+    agent_retriever = get_agent_by_id(client, agent_id)
+    thread_retriever = client.agents.create_thread()
+    message_retriever = client.agents.create_message(
+        thread_id=thread_retriever.id,
+        role="user",
+        content= f"""
+            Projects: {project} 
+            
+            Classifier Outputs: {projects_classified} 
+            Please provide the relevant information for the projects.""",
+    )
+    run = client.agents.create_and_process_run(thread_id=thread_retriever.id, agent_id=agent_retriever.id)
+    messages_retriever = client.agents.list_messages(thread_id=thread_retriever.id)
+    project_info = extract_responses(messages_retriever)
+    print("\n\n\nProject Information:", project_info)
 
-            message = client.agents.create_message(
-                thread_id=thread.id,
-                role="user",
-                content=user_query,
-            )
-
-            run = client.agents.create_and_process_run(thread_id=thread.id, agent_id=agent.id)
-
-            messages = client.agents.list_messages(thread_id=thread.id)
-            display_responses(messages)
-
+  
 
 if __name__ == "__main__":
     asyncio.run(main())
