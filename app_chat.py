@@ -10,16 +10,24 @@ from chainlit.types import ThreadDict
 from typing import Optional
 
 
+USER_DATABASE = {
+    "admin": {"password": "admin", "role": "admin", "email": "admin@example.com"},
+    "john": {"password": "johnpass", "role": "user", "email": "john@example.com"},
+}
+
 @cl.password_auth_callback
 def auth_callback(username: str, password: str) -> Optional[cl.User]:
-    """Basic username and password authentication."""
-    if (username, password) == ("admin", "admin"):
+    user_info = USER_DATABASE.get(username)
+    if user_info and user_info["password"] == password:
         return cl.User(
-            identifier="admin",
-            metadata={"role": "admin", "provider": "credentials"}
+            identifier=username,
+            metadata={
+                "role": user_info["role"],
+                "email": user_info["email"],
+                "provider": "credentials"
+            }
         )
-    else:
-        return None
+    return None     
     
 @cl.on_chat_start
 async def on_chat_start():
