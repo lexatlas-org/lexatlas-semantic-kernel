@@ -1,11 +1,13 @@
 # main.py
 import asyncio
+import os
+from pathlib import Path
 from agent_utils import (
     get_agent_by_id,
     get_project_client,
     get_root_dir,
+    list_all_files_in_folder,
     upload_files_create_vector_store_return_tool,
-    # upload_multiple_files_and_create_vector_store,
 )
 from config import agents_config  # (Still imported for future use)
 
@@ -19,20 +21,9 @@ async def main():
 
     print(f"Running agent: {agent.name} with ID: {agent.id}")
 
-    # with client:  # Important: use async context
-    file_paths = [
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc01.txt",
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc02.txt",
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc03.txt",
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc04.txt",
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc05.txt",
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc06.txt",
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc07.txt",
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc08.txt",
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc09.txt",
-        ROOT_DIR / "prompts" / "docs" / "regulations" / "doc10.txt",
-    ]
-        
+    folder_path = Path(f"{ROOT_DIR}/dataset/regulations")
+    file_paths = list_all_files_in_folder(folder_path)
+ 
     vector_store_name = "my_vector_store"
 
     file_search_tool = upload_files_create_vector_store_return_tool(
