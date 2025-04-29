@@ -195,16 +195,27 @@ def list_all_files_in_folder(folder_path: Path) -> list[str]:
 
 
 # ========== Get Agent by Name ==========
-def get_agent_by_name(client: AIProjectClient, agent_name: str):
+_agent_cache = None
+
+async def get_agent_by_name(client: AIProjectClient, agent_name: str):
+    global _agent_cache
+
     try:
-        for agent in agents_config:
-            if agent['name'] == agent_name:
-                return get_agent_by_id(client, agent['id'])
-        print(f"No agent found with the name {agent_name}.")
+        if _agent_cache is None:
+            _agent_cache = client.agents.list_agents()
+
+        for agent in _agent_cache.data:
+            if agent.name == agent_name:
+                return agent
+
+        print(f" No agent found with the name '{agent_name}'.")
         return None
     except Exception as e:
-        print(f"Error retrieving agent with name {agent_name}: {e}")
+        print(f" Error retrieving agent with name '{agent_name}': {e}")
         return None
+
+        
+        
     
 
 # ========== Get Classifier Agent ==========
