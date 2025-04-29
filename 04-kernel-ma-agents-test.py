@@ -4,14 +4,14 @@ import time
 from agent_utils import (
     extract_responses,
     get_project_client,
-    get_agent_by_id,
+    get_agent_by_name,
     get_root_dir,
     read_all_files_and_join
 )
 from config import agents_config  # Import agents_config from config.py
 
 
-projects = read_all_files_and_join(get_root_dir() / "prompts/docs/projects")
+projects = read_all_files_and_join(get_root_dir() / "dataset/v1/projects")
 project =  """
             Document ID: doc_001
             Title: New York Renewable Energy Siting Law §94-c
@@ -23,8 +23,7 @@ async def main():
 
     # -------------------------------------------------------------------------
     #  Phase 1 - Classify Projects
-    agent_id = "asst_tluMzunuZZ21J1R35fFwCvj0"  # ClassifierAgent
-    agent_classifier = get_agent_by_id(client, agent_id)
+    agent_classifier = get_agent_by_name(client, 'ClassifierAgent')
 
     thread_classifier = client.agents.create_thread()
 
@@ -42,8 +41,7 @@ async def main():
 
     # -------------------------------------------------------------------------
     # Phase 2 - Retrieve Project Information
-    agent_id = "asst_tkcxfBRgzYP1rhMIHmU64qFH"  # RegulationRetriever
-    agent_retriever = get_agent_by_id(client, agent_id)
+    agent_retriever = get_agent_by_name(client, 'RegulationRetriever')
     thread_retriever = client.agents.create_thread()
     message_retriever = client.agents.create_message(
         thread_id=thread_retriever.id,
@@ -59,6 +57,26 @@ async def main():
     project_info = extract_responses(messages_retriever)
     print("\n\n\nProject Information:", project_info)
 
+    # -------------------------------------------------------------------------
+    # Phase 3 - Compliance Check
+    agent_checker = get_agent_by_name(client, 'ComplianceChecker')
+    thread_checker = client.agents.create_thread()
+    message_checker = client.agents.create_message(
+        thread_id=thread_checker.id,
+        role="user",
+        content= f"""
+            Projects: {project} 
+            
+            Classifier Outputs: {projects_classified} 
+            
+            Project Information: {project_info} 
+            
+            Please check the compliance of the projects.""",
+    )
+    run = client.agents.create_and_process_run(thread_id=thread_checker.id, agent_id=agent_checker.id)
+    messages_checker = client.agents.list_messages(thread_id=thread_checker.id)
+    compliance_check = extract_responses(messages_checker)  
+    print("\n\n\nCompliance Check:", compliance_check)
   
 
 if __name__ == "__main__":
