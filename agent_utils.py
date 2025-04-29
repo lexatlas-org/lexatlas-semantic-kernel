@@ -197,18 +197,22 @@ def list_all_files_in_folder(folder_path: Path) -> list[str]:
 # ========== Get Agent by Name ==========
 _agent_cache = None
 
-async def get_agent_by_name(client: AIProjectClient, agent_name: str):
+async def get_agent_by_name(client: AIProjectClient, agent_name: str, wait: bool = False):
     global _agent_cache
- 
+
     if _agent_cache is None:
-        _agent_cache = await client.agents.list_agents()
-    
+        if wait:
+            _agent_cache = await client.agents.list_agents()
+        else:
+            _agent_cache = client.agents.list_agents()
+
     for agent in _agent_cache.data:
         if agent.name == agent_name:
             return agent
 
     print(f" No agent found with the name '{agent_name}'.")
     return None
+
  
 # ========== Get Classifier Agent ==========
 async def get_azure_agent_by_name(client: AIProjectClient, agent_name: str):
