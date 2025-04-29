@@ -1,0 +1,18 @@
+{
+    "@odata.context": "https://${AZURE_SEARCH_NAME}.search.windows.net/$metadata#datasources/$entity",
+    "name": "${AZURE_SEARCH_DATASOURCE}",
+    "description": null,
+    "type": "azureblob",
+    "subtype": null,
+    "credentials": {
+      "connectionString": "DefaultEndpointsProtocol=https;AccountName=mgsdsearchstorage5050;AccountKey=..."
+    },
+    "container": {
+      "name": "${AZURE_STORAGE_CONTAINER}",
+      "query": null
+    },
+    "dataChangeDetectionPolicy": null,
+    "dataDeletionDetectionPolicy": null,
+    "encryptionKey": null,
+    "identity": null
+  }
