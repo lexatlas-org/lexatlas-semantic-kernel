@@ -5,6 +5,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 from agent_utils import (
     extract_responses,
+    get_azure_agent_by_name,
     get_project_client,
     get_agent_by_name,
     get_root_dir,
@@ -54,7 +55,6 @@ async def main():
                         conn_str= os.environ.get("AZURE_AI_AGENT_PROJECT_CONNECTION_STRING"),
                         credential=credential
                     )
-    # print("✅ Project client initialized.")
 
     async with credential, AzureAIAgent.create_client(credential=credential) as client:
 
@@ -63,17 +63,10 @@ async def main():
         # -------------------------------------------------------------------------
         print("\n[Setup] Creating Agents...", client)
         
-        agent_classifier_def = await get_agent_by_name(client, 'ClassifierAgent')
-        agent_retriever_def = await get_agent_by_name(client, 'RegulationRetriever')
-        agent_checker_def = await get_agent_by_name(client, 'ComplianceChecker')
-        agent_reporter_def = await get_agent_by_name(client, 'ReportGenerator')
-
-
-
-        agent_classifier = AzureAIAgent(client=client, definition=agent_classifier_def)
-        agent_retriever = AzureAIAgent(client=client, definition=agent_retriever_def)
-        agent_checker = AzureAIAgent(client=client, definition=agent_checker_def)
-        agent_reporter = AzureAIAgent(client=client, definition=agent_reporter_def)
+        agent_classifier = await get_azure_agent_by_name(client, 'ClassifierAgent')
+        agent_retriever = await get_azure_agent_by_name(client, 'RegulationRetriever')
+        agent_checker = await get_azure_agent_by_name(client, 'ComplianceChecker')
+        agent_reporter = await get_azure_agent_by_name(client, 'ReportGenerator')
 
         agents = [
             agent_classifier,
@@ -93,45 +86,7 @@ async def main():
             termination_strategy=DefaultTerminationStrategy(maximum_iterations=len(agents))
         )
 
- 
 
-
- 
-
-
-        # # Create one conversation thread for all
-        # thread = client.agents.create_thread()
-
-        # # -------------------------------------------------------------------------
-        # # Phase 1 - Create User Message
-        # # -------------------------------------------------------------------------
-        # print("\n[User] Sending project to agent group...")
-
-        # message = await client.agents.create_message(
-        #     thread_id=thread.id,
-        #     role="user",
-        #     content=f"""
-        #     Please complete the following steps:
-        #     1. Classify the project.
-        #     2. Retrieve regulatory information.
-        #     3. Check compliance.
-        #     4. Generate a final report.
-
-        #     Project:
-        #     {project}
-        #     """
-        # )
-
-        # # -------------------------------------------------------------------------
-        # # Phase 2 - Create Group Chat (Auto Handle Agents)
-        # # -------------------------------------------------------------------------
-        # print("\n[Chat] Setting up Agent Group Chat...")
-
-        # group_chat = AgentGroupChat(
-        #     agents=agents,
-        #     selection_strategy=SequentialSelectionStrategy(initial_agent=agent_classifier),
-        #     termination_strategy=DefaultTerminationStrategy(maximum_iterations=len(agents))
-        # )
 
         # Prepare the first user message as a hybrid ChatMessageContent
         user_message = ChatMessageContent(

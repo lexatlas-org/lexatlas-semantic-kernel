@@ -8,6 +8,7 @@ from azure.ai.projects import AIProjectClient
 from azure.identity import DefaultAzureCredential
 from IPython.display import display, Image
 from azure.ai.projects.models import FileSearchTool, OpenAIFile, VectorStore
+from semantic_kernel.agents import AzureAIAgent, AzureAIAgentSettings
 
 from config import agents_config  
 
@@ -25,6 +26,7 @@ def get_project_client(connection_string: str = None) -> AIProjectClient:
     return AIProjectClient.from_connection_string(credential=credential, conn_str=conn_str)
 
 # ========== Agent Management ==========
+# agent definition, then use AzureAIAgent
 async def create_agent_and_thread(
     client: AIProjectClient,
     model_name: str = "gpt-4o-mini",
@@ -38,6 +40,12 @@ async def create_agent_and_thread(
     )
     thread = client.agents.create_thread()
     return agent, thread
+
+    # # 2. Create a Semantic Kernel agent based on the agent definition
+    # agent = AzureAIAgent(
+    #     client=client,
+    #     definition=agent_definition,
+    # )
 
 # ========== Agent Execution ==========
 async def run_query(
@@ -197,3 +205,20 @@ def get_agent_by_name(client: AIProjectClient, agent_name: str):
     except Exception as e:
         print(f"Error retrieving agent with name {agent_name}: {e}")
         return None
+    
+
+# ========== Get Classifier Agent ==========
+async def get_azure_agent_by_name(client: AIProjectClient, agent_name: str):
+    try:
+        agent_def = await get_agent_by_name(client, agent_name)
+        if not agent_def:
+            raise ValueError("ClassifierAgent not found.")
+        
+        agent = AzureAIAgent(client=client, definition=agent_def)
+        return agent
+        
+    except Exception as e:
+        print(f"Error retrieving agent with name {agent_name}: {e}")
+        return None
+    
+ 
