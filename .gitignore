@@ -45,5 +45,5 @@ build/
 *.tsbuildinfo
  
 
- *.zip
- .files/
+*.zip
+.files/
