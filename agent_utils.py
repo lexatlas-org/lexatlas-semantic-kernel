@@ -176,4 +176,9 @@ def upload_files_create_vector_store_return_tool(client, file_paths: list[str], 
 
     return file_search_tool
 
-
+# ========== List All Files in Folder ==========
+def list_all_files_in_folder(folder_path: Path) -> list[str]:
+    if not folder_path.is_dir():
+        raise NotADirectoryError(f"{folder_path} is not a valid directory.")
+    
+    return [str(file.resolve()) for file in folder_path.glob("**/*") if file.is_file()]
