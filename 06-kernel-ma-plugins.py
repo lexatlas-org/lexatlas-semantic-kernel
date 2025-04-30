@@ -12,7 +12,7 @@ from openai import AsyncOpenAI
 # Load environment variables
 load_dotenv()
 
-from plugins.compliance_plugin import CompliancePlugin  # 👈 Import plugin
+from plugins.compliance_plugin import CompliancePlugin   
 
 
 # Setup OpenAI client
