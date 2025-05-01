@@ -3,7 +3,7 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "subscriptionId": {
-            "value": "ce276267-bb50-40de-969d-1ba8d7704220"
+            "value": ""
         },
         "resourceGroupName": {
             "value": "mg-demo10"
