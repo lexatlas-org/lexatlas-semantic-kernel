@@ -1,10 +1,6 @@
-Here is the updated `README.md` for **LexAtlas Frontend**, with a reference to completing the `01-Azure AI Search Deployment Tutorial.md` first, and maintaining a clean, professional tone:
-
----
-
 # LexAtlas Frontend
 
-This project is built using **Chainlit**, a framework for prototyping, debugging, and sharing applications built on top of large language models (LLMs). It integrates a **PostgreSQL** database as the data layer and uses **Prisma** as the ORM for managing database migrations.
+This project is built using **Chainlit**, a framework for prototyping, debugging, and sharing applications built on top of large language models (LLMs). It integrates with **Azure AI Services** and Semantic Kernel to manage conversational AI agents in legal and regulatory scenarios.
 
 > **Note:** Before running this frontend application, make sure you have completed the setup described in the following tutorials:
 >
@@ -37,17 +33,13 @@ Chainlit is a framework designed to simplify the development of applications tha
 
 In this project, Chainlit manages user sessions, chat interactions, and integrates with Azure AI services.
 
-### 2. PostgreSQL
+### 2. Semantic Kernel Integration
 
-PostgreSQL is the primary relational database used to persist application data.
+This frontend communicates with AI agents hosted in Azure through Semantic Kernel, enabling:
 
-### 3. Prisma
-
-Prisma is used as the ORM to manage database access and migrations, offering:
-
-- Type-safe queries
-- Schema modeling
-- Migration tools
+- Multi-agent orchestration
+- Tool and plugin integration
+- Evaluation pipelines for legal tasks
 
 ---
 
@@ -59,7 +51,6 @@ Make sure you have:
 
 - Python 3.10 or higher
 - Node.js and npm
-- PostgreSQL installed and running
 
 Install Python dependencies:
 
@@ -67,62 +58,23 @@ Install Python dependencies:
 pip install -r requirements.txt
 ```
 
-Install Prisma CLI globally:
+Install Chainlit globally (if not already):
 
 ```bash
-npm install -g prisma
+pip install chainlit
 ```
 
 ---
 
 ### 2. Configure Environment Variables
 
-Create a `.env` file in the `init/` directory based on `.env_example`:
+Create a `.env` file in the root of your project based on the provided `.env_example` and define required keys:
 
 ```env
-DATABASE_URL="postgresql://user:password@localhost:5432/database_name"
-```
-
----
-
-### 3. Set Up PostgreSQL
-
-Install and configure PostgreSQL:
-
-```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-```
-
-Then, inside a PostgreSQL prompt:
-
-```sql
-CREATE USER demo_user WITH PASSWORD '12345';
-CREATE DATABASE demo_db OWNER demo_user;
-GRANT ALL PRIVILEGES ON DATABASE demo_db TO demo_user;
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
-```
-
----
-
-### 4. Apply Prisma Migrations
-
-To initialize the database:
-
-```bash
-npx prisma migrate reset
-```
-
-To create a new migration:
-
-```bash
-npx prisma migrate dev --name init
-```
-
-To deploy to production:
-
-```bash
-npx prisma migrate deploy
+OPENAI_API_KEY=your-openai-api-key
+CHAINLIT_AUTH_SECRET=your-auth-secret
+AZURE_AI_AGENT_PROJECT_CONNECTION_STRING=...
+AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME=gpt-4o-mini
 ```
 
 ---
@@ -134,10 +86,7 @@ npx prisma migrate deploy
 ├── app.py                # Main application file
 ├── kernel.py             # Semantic Kernel setup
 ├── infra/                # Infrastructure files
-├── init/                 # Prisma schema and migrations
-│   ├── schema.prisma     
-│   ├── migrations/       
-│   └── .env_example      
+├── prompts/              # Prompt templates for AI agents
 ├── docs/                 # Documentation
 ├── .chainlit/            # Chainlit configuration
 └── readme.md             # Project documentation
@@ -153,30 +102,23 @@ npx prisma migrate deploy
    chainlit run app.py
    ```
 
-2. Modify the database schema in `schema.prisma`.
+2. Update prompt instructions or semantic kernel settings as needed.
 
-3. Generate a new migration:
-
-   ```bash
-   npx prisma migrate dev --name migration_name
-   ```
-
-4. Use the Chainlit interface to interact with the application and test updates.
+3. Use the Chainlit interface to interact with the application and validate AI behavior.
 
 ---
 
 ## Useful Links
 
 - [Chainlit Documentation](https://docs.chainlit.io)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Semantic Kernel](https://aka.ms/semantic-kernel)
+- [OpenAI Documentation](https://platform.openai.com/docs)
 
 ---
 
 ## Notes
 
-- Ensure the `pgcrypto` extension is enabled for UUIDs.
-- Always use `npx prisma migrate deploy` in production environments.
-- Chainlit supports custom authentication via the `auth_callback` function in `app.py`.
+- Make sure your environment variables point to valid Azure services and deployments.
+- Agent orchestration is handled via Semantic Kernel logic inside `kernel.py`.
+- You can switch between `app.py` and `app_chat.py` by changing the `CHAINLIT_APP` environment variable.
 
-Let me know if you'd like this saved as a file or directly integrated into your repo.
