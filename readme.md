@@ -11,6 +11,7 @@ This project is built using **Chainlit**, a framework for prototyping, debugging
 > - `readme-01-Azure AI Search Deployment Tutorial.md` – for deploying Cognitive Search, Storage, and OpenAI using CLI scripts.
 > - `readme-02-AI Foundary Deployment Tutorial.md` – for deploying the full Azure AI infrastructure stack using Bicep templates.
 > - `readme-03-Agent Setup and Automation Tutorial.md` – for automatically creating and configuring AI agents with specific models and instructions for evaluation.
+> - `readme-04-Docker Compose Setup Tutorial.md` – for running the initial version of the application stack using Docker Compose with environment variables configured for local development.
 
 ---
 
