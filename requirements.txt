@@ -1,10 +1,23 @@
+# Chainlit frontend interface
 chainlit
-openai     
-python-dotenv   
-psycopg2-binary   
-sqlalchemy   
-semantic-kernel
+
+# OpenAI API support
+openai
+
+# Environment variable support
+python-dotenv
+
+# PostgreSQL support
+psycopg2-binary
 asyncpg
+sqlalchemy
+
+# Semantic Kernel & Agent orchestration
+semantic-kernel
+azure-ai-agents  # Includes azure.ai.projects, agents, threads, tools
+
+# Azure AI SDKs
 azure-ai-ml
 azure-search-documents
 azure-core
+azure-identity
