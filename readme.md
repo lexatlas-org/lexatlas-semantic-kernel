@@ -11,6 +11,12 @@ This project is built using **Chainlit**, a framework for prototyping, debugging
 
 ---
 
+## Reference
+
+For an overview of the project's vision and context, see the accompanying document:
+
+[LexAtlas — Legal Intelligence for Real-World Impact (PDF)](docs/LexAtlas_ Legal Intelligence for Real-World Impact.pdf)
+
 ## Quick Start
 
 To run the application, use the following command:
