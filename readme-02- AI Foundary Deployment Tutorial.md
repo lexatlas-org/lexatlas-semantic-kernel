@@ -2,13 +2,24 @@
 
 ---
 
+
 ## ⚠️ Important Note
 
 > **Currently, there is a known issue affecting the automated creation of AI Hub and AI Project resources.**  
 >
-> As a temporary workaround, we recommend manually creating the **AI Hub** and **AI Project** through the Azure Portal using the standard graphical interface. Once created, these resources can still be referenced and configured within your deployment pipeline.
+> As a temporary workaround:
 >
-> Our team is actively working on resolving this bug in the Bicep module to restore full automation.
+> - Manually create the **AI Hub** and **AI Project** using the Azure Portal (via the graphical interface).
+> - Once created, you can still reference these resources in your `.env` and use them in your workflows.
+>
+> In addition, you **must manually create two model deployments** inside your Azure OpenAI resource:
+>
+> - A deployment for the model `gpt-4o` (e.g., named `gpt-4o`)
+> - A deployment for the model `gpt-4o-mini` (e.g., named `gpt-4o-mini`)
+>
+> These deployments are required for the AI agents to function correctly in later stages.
+>
+> Our team is actively working on resolving this limitation in the Bicep templates to restore full automation.
 
 ---
 
