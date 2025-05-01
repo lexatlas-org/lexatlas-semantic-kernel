@@ -5,3 +5,6 @@ psycopg2-binary
 sqlalchemy   
 semantic-kernel
 asyncpg
+azure-ai-ml
+azure-search-documents
+azure-core
