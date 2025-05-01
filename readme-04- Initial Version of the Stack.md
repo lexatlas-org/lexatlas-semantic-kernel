@@ -1,12 +1,12 @@
-# Initial Version of the Stack: Running with Docker Compose
+# 04 - Docker Compose Setup Tutorial
 
-This guide explains how to run the initial version of the **LexAtlas** application stack using Docker Compose. It sets up a development-ready environment for working with the frontend, agents, and database.
+This guide explains how to run the initial version of the **LexAtlas** application stack using Docker Compose. It sets up a development-ready environment for working with the frontend, AI agents, and PostgreSQL database.
 
 ---
 
 ## Prerequisites
 
-Make sure the following tools are installed:
+Make sure the following tools are installed on your machine:
 
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/install/)
@@ -15,72 +15,57 @@ Make sure the following tools are installed:
 
 ## 1. Required Environment Variables
 
-Before running the stack, you need to provide two environment variables.
+Before running the stack, create a `.env` file in your project root directory and define the following variables:
 
-### `OPENAI_API_KEY`
+### Basic Configuration
 
-This is your API key for accessing OpenAI services (e.g., GPT-4, GPT-4o).
-
-To obtain it:
-
-1. Visit [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
-2. Log in with your OpenAI account
-3. Click **"Create new secret key"**
-4. Copy the key and store it securely
-
-### `CHAINLIT_AUTH_SECRET`
-
-This is used to secure access to the Chainlit frontend.
-
-To generate a strong secret:
-
-```bash
-openssl rand -base64 32
+```env
+OPENAI_API_KEY=your-openai-api-key
+CHAINLIT_AUTH_SECRET=your-chainlit-auth-secret
 ```
 
-Copy the resulting string and use it in your `.env` file or environment settings.
+### Azure AI Agent Integration
+
+```env
+AZURE_AI_AGENT_PROJECT_CONNECTION_STRING="<region>.api.azureml.ms;<workspace-id>;<resource-group-name>;<project-name>"
+AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME="gpt-4o-mini"
+PROJECT_CONNECTION_STRING="<region>.api.azureml.ms;<workspace-id>;<resource-group-name>;<project-name>"
+```
+
+### Optional: Azure Cognitive Search
+
+```env
+AZURE_SEARCH_ENDPOINT=https://<your-search-service>.search.windows.net/
+AZURE_SEARCH_API_KEY=your-search-api-key
+AZURE_SEARCH_INDEX_NAME=your-index-name
+```
+
+> **Note:** Never commit your `.env` file to version control. Add it to `.gitignore` to keep your secrets secure.
 
 ---
 
 ## 2. Set Up Your Environment
 
-You can set the variables in one of two ways:
+You can define environment variables using either method below:
 
-### Option 1: Using a `.env` File
+### Option 1: `.env` File (Recommended)
 
-Create a `.env` file in the root of your project:
+Create a `.env` file at the root of your project with all variables listed above.
 
-```bash
-touch .env
-```
-
-Then add the following:
-
-```env
-OPENAI_API_KEY=your-openai-api-key-here
-CHAINLIT_AUTH_SECRET=your-random-auth-secret-here
-```
-
-> **Important:** Never commit `.env` files to version control. Add it to `.gitignore`.
-
----
-
-### Option 2: Export Them in Your Shell
-
-You can also export them temporarily in your terminal session:
+### Option 2: Export in Terminal (Temporary)
 
 ```bash
-export OPENAI_API_KEY=your-openai-api-key-here
-export CHAINLIT_AUTH_SECRET=your-random-auth-secret-here
+export OPENAI_API_KEY=your-api-key
+export CHAINLIT_AUTH_SECRET=your-auth-secret
 ```
 
-These will only persist while your shell session is active.
+These will persist only during your terminal session.
 
 ---
 
 ## 3. Run the Stack
 
-Build and launch the services with:
+Use Docker Compose to build and launch all services:
 
 ```bash
 docker-compose up --build
@@ -88,57 +73,57 @@ docker-compose up --build
 
 This will:
 
-- Build Docker containers
-- Inject your environment variables
-- Start the app, PostgreSQL, and other services
+- Build the Chainlit-based frontend application
+- Start a PostgreSQL database container
+- Inject environment variables from the `.env` file or shell
 
 ---
 
 ## 4. Access the Application
 
-Once the containers are up, open your browser:
+Once the stack is running, open your browser to:
 
 ```
 http://localhost:4000
 ```
 
-You'll be prompted to log in using Chainlit’s built-in authentication.
+You’ll be prompted to authenticate via Chainlit using the token set in `CHAINLIT_AUTH_SECRET`.
 
 ---
 
 ## 5. Stop the Stack
 
-To shut everything down:
+To gracefully stop all containers:
 
 ```bash
 docker-compose down
 ```
 
-This stops and removes all containers.
+This will shut down all services but preserve your database volume unless manually removed.
 
 ---
 
 ## 6. Data Persistence and Analysis
 
-All user interactions, conversation history, and agent responses are **persistently stored in the local PostgreSQL database**. This includes:
+All conversation history and AI agent outputs are saved to the PostgreSQL database. This includes:
 
-- Chat history between the user and agents
-- Output from classification, regulation retrieval, compliance checks, and reports
-- User credentials and session metadata (if enabled)
+- User–agent interactions
+- Task results (classification, retrieval, compliance checks, and reports)
+- User metadata and session logs
 
-This setup allows for:
+This data can be used for:
 
-- **Auditing and traceability** of agent decisions
-- **Post-run analysis** for debugging, fine-tuning, or evaluation
-- **Data extraction and visualization** using BI tools or Jupyter notebooks
+- Post-run analysis and auditing
+- Debugging and performance evaluation
+- Visualization using BI tools or Jupyter notebooks
 
-> **Note:** The database runs inside a Docker container and is mounted with persistent volume storage by default. You can connect to it using any PostgreSQL client for further inspection.
+> The PostgreSQL container uses persistent volume storage defined in `docker-compose.yml`. You can connect to it using standard PostgreSQL clients.
 
 ---
 
 ## Notes
 
-- This setup represents the **initial version** of the development stack.
-- As the project evolves, more services and configurations will be added.
-- For production environments, consider using secure secret managers like **Azure Key Vault** or **Docker Secrets**.
- 
+- This is the initial version of the LexAtlas development stack
+- Additional services and orchestration layers may be added in future iterations
+- For production, consider using secret managers such as Azure Key Vault or Docker Secrets
+
