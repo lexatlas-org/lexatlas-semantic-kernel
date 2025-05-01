@@ -1,23 +1,36 @@
-# Chainlit frontend interface
-chainlit
+# Chainlit (frontend + UI)
+chainlit==2.5.5
 
-# OpenAI API support
-openai
+# Azure AI SDKs (Agents, Projects, Search, Identity)
+azure-ai-inference==1.0.0b9
+azure-ai-projects==1.0.0b9
+azure-identity==1.21.0
+azure-search-documents==11.6.0b11
+azure-core==1.33.0
 
-# Environment variable support
-python-dotenv
+# LLM orchestration and agent runtime
+semantic-kernel==1.28.1
 
-# PostgreSQL support
-psycopg2-binary
-asyncpg
-sqlalchemy
+# OpenAI + Anthropic (optional)
+openai==1.75.0
+anthropic==0.50.0
 
-# Semantic Kernel & Agent orchestration
-semantic-kernel
-azure-ai-agents  # Includes azure.ai.projects, agents, threads, tools
+# Environment configuration
+python-dotenv==1.1.0
 
-# Azure AI SDKs
-azure-ai-ml
-azure-search-documents
-azure-core
-azure-identity
+# Database support (PostgreSQL async + sync)
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
+SQLAlchemy==2.0.40
+
+# FastAPI server (if applicable)
+fastapi==0.115.9
+uvicorn==0.34.2
+
+# Optional extras you may use in your app:
+pydantic==2.11.3
+requests==2.32.3
+tiktoken==0.9.0
+
+
+ipython==9.1.0

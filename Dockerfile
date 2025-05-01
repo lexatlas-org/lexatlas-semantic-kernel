@@ -11,7 +11,7 @@ COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Now copy the rest of the application files
-COPY app.py app_chat.py kernel.py kernel_chat.py agent_utils.py .env /app/
+COPY app.py app_chat.py kernel.py kernel_chat.py agent_utils.py config.py .env /app/
 
 # Expose Chainlit's default port
 EXPOSE 8000
@@ -22,6 +22,9 @@ ENV CHAINLIT_APP=app.py
 
 
 # Run Chainlit using the chosen app file
-CMD ["tail", "-f", "/dev/null"]
+# CMD ["tail", "-f", "/dev/null"]
 
 # CMD ["chainlit", "run", $CHAINLIT_APP, "--host", "0.0.0.0", "--port", "8000"]
+
+# Run Chainlit using the chosen app file
+CMD ["sh", "-c", "chainlit run $CHAINLIT_APP --host 0.0.0.0 --port 8000"]
