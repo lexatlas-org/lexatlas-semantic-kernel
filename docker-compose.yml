@@ -6,7 +6,13 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
+      - CHAINLIT_APP=${CHAINLIT_APP:-app.py}
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:postgres@db:5432/postgres}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - CHAINLIT_AUTH_SECRET=${CHAINLIT_AUTH_SECRET}
+      - AZURE_AI_AGENT_PROJECT_CONNECTION_STRING=${AZURE_AI_AGENT_PROJECT_CONNECTION_STRING}
+      - AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME=${AZURE_AI_AGENT_MODEL_DEPLOYMENT_NAME}
+      - PROJECT_CONNECTION_STRING=${PROJECT_CONNECTION_STRING}
     depends_on:
       - db
 
@@ -17,8 +23,6 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
-    # ports:
-    #   - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
