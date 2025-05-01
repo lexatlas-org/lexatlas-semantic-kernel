@@ -1,3 +1,73 @@
+## ⚠️ Note on Container Permissions
+
+We are currently working on resolving permission issues related to running the application within the Docker container. In the meantime, we recommend running `app_chat.py` directly from your local environment using a virtual environment (`venv`). Below is a quick guide to do so:
+
+### ✅ Quick Guide: Run `app_chat.py` Locally with venv
+
+1. **Create the virtual environment** (if you haven’t already):
+
+```bash
+python -m venv venv
+```
+
+2. **Activate the virtual environment**:
+
+- On Linux/macOS:
+
+```bash
+source venv/bin/activate
+```
+
+- On Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+3. **Install dependencies**:
+
+```bash
+pip install -r requirements.txt
+```
+
+4. **Configure your environment variables** in a `.env` file (in the project root). Make sure to include the following:
+
+#### 🔗 `DATABASE_URL`
+
+Chainlit requires a PostgreSQL connection. If you're working locally:
+
+- Install PostgreSQL on your machine.
+  - **macOS:** `brew install postgresql`
+  - **Ubuntu:** `sudo apt install postgresql`
+  - **Windows:** Download from [https://www.postgresql.org/download/](https://www.postgresql.org/download/)
+
+- Create a local database and use a connection string like:
+
+```env
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/lexatlas
+```
+
+Ensure the database exists and is accessible with the provided credentials.
+
+#### 🔐 `LITERAL_API_KEY`
+
+Chainlit uses this for its internal features and telemetry. You can obtain it by creating a free account at [https://app.chainlit.io](https://app.chainlit.io), then go to your account settings to get the key.
+
+```env
+LITERAL_API_KEY=your_chainlit_api_key
+```
+
+> Your `.env` file should also include other required keys (e.g., OpenAI, Azure) used throughout the app.
+
+5. **Run the application**:
+
+```bash
+chainlit run app_chat.py --host 0.0.0.0 --port 8000
+```
+
+> This will launch the app locally at [http://localhost:8000](http://localhost:8000)
+ 
+ 
 # 05 - Running app_chat.py with Docker Compose
 
 This guide explains how to run the `app_chat.py` variant of the LexAtlas frontend using Docker Compose. This version of the application is intended for conversational testing with AI agents using Chainlit, integrated with Semantic Kernel and Azure AI infrastructure.
