@@ -6,11 +6,11 @@ Here is the updated `README.md` for **LexAtlas Frontend**, with a reference to c
 
 This project is built using **Chainlit**, a framework for prototyping, debugging, and sharing applications built on top of large language models (LLMs). It integrates a **PostgreSQL** database as the data layer and uses **Prisma** as the ORM for managing database migrations.
 
-> **Note:** Before running this frontend application, make sure you have completed the setup described in both:
+> **Note:** Before running this frontend application, make sure you have completed the setup described in the following tutorials:
 >
-> - `readme- 01 - Azure AI Search Deployment Tutorial.md` – for deploying Cognitive Search, Storage, and OpenAI using CLI scripts.
-> - `readme - 02 - AI Foundary Deployment Tutorial.md` – for deploying the full Azure AI infrastructure stack using Bicep templates.
-
+> - `readme-01-Azure AI Search Deployment Tutorial.md` – for deploying Cognitive Search, Storage, and OpenAI using CLI scripts.
+> - `readme-02-AI Foundary Deployment Tutorial.md` – for deploying the full Azure AI infrastructure stack using Bicep templates.
+> - `readme-03-Agent Setup and Automation Tutorial.md` – for automatically creating and configuring AI agents with specific models and instructions for evaluation.
 
 ---
 
