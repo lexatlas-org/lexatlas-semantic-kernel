@@ -1,4 +1,4 @@
-# Azure AI Search Deployment (CLI Tutorial)
+# 01 - Azure AI Search Deployment Tutorial
 
 This tutorial provides a step-by-step guide to deploying a complete Azure AI Search solution using Azure CLI. It covers provisioning the necessary resources, uploading content to blob storage, and configuring a full indexing pipeline with AI enrichment and OpenAI integration.
 
