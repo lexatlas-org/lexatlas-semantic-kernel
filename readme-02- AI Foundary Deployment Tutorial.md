@@ -1,5 +1,17 @@
 # 02 - AI Foundary Deployment Tutorial
 
+---
+
+## ⚠️ Important Note
+
+> **Currently, there is a known issue affecting the automated creation of AI Hub and AI Project resources.**  
+>
+> As a temporary workaround, we recommend manually creating the **AI Hub** and **AI Project** through the Azure Portal using the standard graphical interface. Once created, these resources can still be referenced and configured within your deployment pipeline.
+>
+> Our team is actively working on resolving this bug in the Bicep module to restore full automation.
+
+---
+
 This manual provides step-by-step instructions for deploying a complete AI infrastructure on Azure using Bash scripts and Bicep templates.
 
 ---
