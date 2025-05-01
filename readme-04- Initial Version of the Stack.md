@@ -118,6 +118,24 @@ This stops and removes all containers.
 
 ---
 
+## 6. Data Persistence and Analysis
+
+All user interactions, conversation history, and agent responses are **persistently stored in the local PostgreSQL database**. This includes:
+
+- Chat history between the user and agents
+- Output from classification, regulation retrieval, compliance checks, and reports
+- User credentials and session metadata (if enabled)
+
+This setup allows for:
+
+- **Auditing and traceability** of agent decisions
+- **Post-run analysis** for debugging, fine-tuning, or evaluation
+- **Data extraction and visualization** using BI tools or Jupyter notebooks
+
+> **Note:** The database runs inside a Docker container and is mounted with persistent volume storage by default. You can connect to it using any PostgreSQL client for further inspection.
+
+---
+
 ## Notes
 
 - This setup represents the **initial version** of the development stack.
